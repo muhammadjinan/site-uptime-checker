@@ -39,7 +39,7 @@ def check_site():
         remarks = "Accessible"
         if "access denied" in response.text.lower() or "geo-blocked" in response.text.lower():
             remarks = "Possible Geo-Block Text Detected"
-        elif status in:
+        elif status == 403 or status == 451:
             remarks = "Restricted / Forbidden"
 
             
