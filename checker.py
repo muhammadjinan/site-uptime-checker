@@ -44,12 +44,14 @@ def check_site():
 
             
         log_to_supabase(status, latency, remarks)
-        print(f"[{REGION}] Status: {status} | Latency: {latency}ms | {remarks}")
-
+        print(f"[{REGION}] URL: {TARGET_URL} | Status: {status} | Latency: {latency}ms | {remarks}")
+        
     except requests.exceptions.Timeout:
         log_to_supabase(0, 0, "Timeout (Potential Geo-block or Down)")
+        print(f"[{REGION}] URL: {TARGET_URL} | Result: Timeout (Potential Geo-block or Down)")
     except Exception as e:
         log_to_supabase(0, 0, f"Failed: {str(e)}")
+        print(f"[{REGION}] URL: {TARGET_URL} | Result: Failed to connect | Error: {str(e)}")
 
 if __name__ == "__main__":
     check_site()
