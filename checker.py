@@ -4,7 +4,7 @@ import time
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-TARGET_URL = os.environ.get("TARGET_URL", "https://example.com") 
+TARGET_URL = os.environ.get("TARGET_URL", "https://google.com") 
 REGION = os.environ.get("RUNNER_REGION", "Unknown") 
 
 def log_to_supabase(status_code, latency, remarks):
