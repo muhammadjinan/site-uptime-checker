@@ -36,6 +36,7 @@ jobs:
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        TARGET_URL: "https://autogestion.magyp.gob.ar/" # CHANGE THIS to whatever site you want to watch!
+        # ADD ALL SITES YOU WANT TO TRACK HERE, SEPARATED BY COMMAS
+        TARGET_URL: "https://autogestion.magyp.gob.ar/, https://autogestion.magyp.gob.ar, https://github.com, https://google.com"
         RUNNER_REGION: ${{ matrix.region }}
       run: python checker.py
