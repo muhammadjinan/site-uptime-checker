@@ -9,6 +9,8 @@ REGION = os.environ.get("RUNNER_REGION", "Unknown")
 
 def log_to_supabase(url, status_code, latency, remarks):
     api_url = f"{SUPABASE_URL}/rest/v1/site_checks"
+    
+    # We pass the publishable key into both apiKey and authorization headers to bypass the legacy JWT constraint
     headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": "Bearer " + SUPABASE_KEY,
@@ -24,7 +26,12 @@ def log_to_supabase(url, status_code, latency, remarks):
     }
     try:
         r = requests.post(api_url, headers=headers, json=data, timeout=5)
-        print(f"Logged to Supabase for {url}. Response code: {r.status_code}")
+        print(f"Logged to Supabase for {url}. Server Response Code: {r.status_code}")
+        
+        # If Supabase rejects it, print out the explanation text in the console logs
+        if r.status_code >= 400:
+            print(f"🚨 Supabase rejected the insert request: {r.text}")
+            
     except Exception as e:
         print(f"Failed to log data to Supabase for {url}: {e}")
 
