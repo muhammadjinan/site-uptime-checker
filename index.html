@@ -32,12 +32,12 @@
 
         async function fetchUptimeLogs() {
             // Fetch the last 150 checks to get a good history distribution
-            const endpoint = `${SUPABASE_URL}/rest/v1/site_checks?order=checked_at.desc&limit=150`;
+            const endpoint = SUPABASE_URL + "/rest/v1/site_checks?order=checked_at.desc&limit=150";
             try {
                 const response = await fetch(endpoint, {
                     headers: {
                         "apikey": SUPABASE_KEY,
-                        "Authorization": `Bearer ${SUPABASE_KEY}`
+                        "Authorization": "Bearer " + SUPABASE_KEY
                     }
                 });
                 const logs = await response.json();
