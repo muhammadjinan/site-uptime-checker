@@ -4,35 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Service Status Monitor</title>
-    <link href="https://cloudflare.com" rel="stylesheet">
     <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #111827; }
-        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+        /* Pure CSS Design Layout Baseline Engine */
+        body {
+            background-color: #020617;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 24px;
+        }
+        .wrapper {
+            max-width: 1024px;
+            margin: 0 auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+        }
+        h1 { margin: 0; font-size: 28px; font-weight: 900; }
+        p { margin: 4px 0 0 0; color: #94a3b8; font-size: 14px; }
+        button {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            border: 1px solid #1e293b;
+            padding: 10px 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #1e293b; }
+        .site-block {
+            background-color: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+        .site-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+        .site-title { margin: 0; font-size: 18px; font-weight: 700; word-break: break-all; max-width: 70%; }
+        .badge {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            border: 1px solid transparent;
+        }
+        .bg-online { background-color: rgba(16,185,129,0.1); color: #34d399; border-color: rgba(16,185,129,0.2); }
+        .bg-degraded { background-color: rgba(245,158,11,0.1); color: #fbbf24; border-color: rgba(245,158,11,0.2); }
+        .bg-outage { background-color: rgba(239,68,68,0.1); color: #f87171; border-color: rgba(239,68,68,0.2); }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: rgba(2,6,23,0.4);
+            border: 1px solid rgba(30,41,59,0.8);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .card-up { border-color: rgba(16,185,129,0.2); background: rgba(16,185,129,0.02); }
+        .card-down { border-color: rgba(239,68,68,0.2); background: rgba(239,68,68,0.02); }
+        
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #cbd5e1; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .dot-up { background-color: #10b981; box-shadow: 0 0 8px #10b981; }
+        .dot-down { background-color: #ef4444; box-shadow: 0 0 8px #ef4444; }
+        
+        .metric-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+        .metric-label { color: #64748b; }
+        .metric-value { font-weight: 600; font-family: monospace; }
+        .val-up { color: #34d399; }
+        
+        details { background-color: rgba(2,6,23,0.3); border: 1px solid #1e293b; border-radius: 8px; }
+        summary { padding: 12px; font-size: 12px; font-weight: 700; color: #94a3b8; cursor: pointer; }
+        table { border-collapse: collapse; text-align: left; width: 100%; }
+        th { font-size: 10px; text-transform: uppercase; color: #64748b; padding: 10px; border-bottom: 1px solid #1e293b; }
+        td { font-size: 12px; padding: 10px; color: #cbd5e1; border-bottom: 1px solid rgba(30,41,59,0.4); }
+        .code-pill { font-family: monospace; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+        .pill-up { background-color: #064e3b; color: #a7f3d0; }
+        .pill-down { background-color: #7f1d1d; color: #fca5a5; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-8 font-sans selection:bg-indigo-500/30">
+<body>
 
-    <div class="w-full max-w-5xl mx-auto mt-2 sm:mt-6">
-        <header class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-6 gap-4">
+    <div class="wrapper">
+        <header>
             <div>
-                <h1 class="text-3xl font-black text-white tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Global Network Monitor</h1>
-                <p class="text-sm text-slate-400 mt-1.5 font-medium tracking-wide">Real-time multi-regional latency network telemetry</p>
+                <h1>Global Network Monitor</h1>
+                <p>Real-time multi-regional latency network telemetry</p>
             </div>
-            <button onclick="fetchUptimeLogs()" class="w-full sm:w-auto px-4 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-sm font-semibold rounded-xl transition-all cursor-pointer shadow-sm text-slate-200 flex items-center justify-center gap-2 active:scale-95">
-                <span>🔄</span> Refresh Telemetry
-            </button>
+            <button onclick="fetchUptimeLogs()">🔄 Refresh Telemetry</button>
         </header>
 
-        <div id="websites-container" class="space-y-8">
-            <div class="flex flex-col items-center justify-center text-slate-500 py-24 space-y-3">
-                <div class="w-6 h-6 border-2 border-slate-700 border-t-indigo-500 rounded-full animate-spin"></div>
-                <p class="text-sm font-medium tracking-wider">Syncing edge data packages...</p>
-            </div>
+        <div id="websites-container">
+            <div style="text-align: center; color: #64748b; padding: 48px;">Syncing edge data packages...</div>
         </div>
     </div>
-
     <script>
         const SUPABASE_URL = "https://oqemerijdbximspphlgz.supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_iAMHiklN8FM6gisu_EHGRA_XqbkYTSa"; 
@@ -58,7 +140,7 @@
             container.innerHTML = "";
 
             if (!logs || logs.length === 0) {
-                container.innerHTML = '<div class="text-center text-slate-500 py-16 border border-dashed border-slate-800 rounded-2xl bg-slate-900/20 font-medium">No system metrics recorded in database yet.</div>';
+                container.innerHTML = '<div style="text-align:center;color:#64748b;padding:48px;">No records found.</div>';
                 return;
             }
 
@@ -88,39 +170,32 @@
 
                     const nameLabel = rName.replace(/_/g, ' ');
                     const latencyLabel = isUp ? latest.latency_ms + "ms" : "Offline";
-                    const pingColor = isUp ? "text-emerald-400" : "text-slate-500";
-                    const statusDotColor = isUp ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" : "bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]";
-                    const pulseDotColor = isUp ? "bg-emerald-400" : "bg-rose-400";
-                    const cardBorder = isUp ? "border-emerald-500/20 bg-emerald-500/5" : "border-rose-500/20 bg-rose-500/5";
+                    const pingColor = isUp ? "val-up" : "";
+                    const dotClass = isUp ? "dot-up" : "dot-down";
+                    const cardClass = isUp ? "card-up" : "card-down";
 
-                    nodesHtml += '<div class="p-4 rounded-xl border ' + cardBorder + ' transition-all duration-200">' +
-                                    '<div class="flex justify-between items-center mb-3">' +
-                                        '<span class="font-bold text-slate-200 text-xs tracking-wider uppercase">' + nameLabel + '</span>' +
-                                        '<span class="relative flex h-2.5 w-2.5">' +
-                                            '<span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ' + pulseDotColor + '"></span>' +
-                                            '<span class="relative inline-flex rounded-full h-2.5 w-2.5 ' + statusDotColor + '"></span>' +
-                                        '</span>' +
+                    nodesHtml += '<div class="card ' + cardClass + '">' +
+                                    '<div class="card-header">' +
+                                        '<span class="card-title">' + nameLabel + '</span>' +
+                                        '<span class="dot ' + dotClass + '"></span>' +
                                     '</div>' +
-                                    '<div class="space-y-1">' +
-                                        '<div class="flex justify-between items-baseline">' +
-                                            '<span class="text-xs text-slate-500 font-medium">Response Ping:</span>' +
-                                            '<span class="text-sm font-mono font-bold ' + pingColor + '">' + latencyLabel + '</span>' +
-                                        '</div>' +
-                                        '<div class="flex justify-between items-baseline gap-2">' +
-                                            '<span class="text-xs text-slate-500 font-medium">Registry:</span>' +
-                                            '<span class="text-xs font-semibold text-slate-300 truncate max-w-[140px]">' + latest.remarks + '</span>' +
-                                        '</div>' +
+                                    '<div class="metric-row">' +
+                                        '<span class="metric-label">Response Ping:</span>' +
+                                        '<span class="metric-value ' + pingColor + '">' + latencyLabel + '</span>' +
+                                    '</div>' +
+                                    '<div class="metric-row">' +
+                                        '<span class="metric-label">Registry:</span>' +
+                                        '<span class="metric-value" style="font-size:11px;">' + latest.remarks + '</span>' +
                                     '</div>' +
                                 '</div>';
                 });
-
                 let masterBadge = "";
                 if (globalUpCount === regionCount) {
-                    masterBadge = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">● ONLINE</span>';
+                    masterBadge = '<span class="badge bg-online">● ONLINE</span>';
                 } else if (globalUpCount > 0) {
-                    masterBadge = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">▲ DEGRADED</span>';
+                    masterBadge = '<span class="badge bg-degraded">▲ DEGRADED</span>';
                 } else {
-                    masterBadge = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">■ OUTAGE</span>';
+                    masterBadge = '<span class="badge bg-outage">■ OUTAGE</span>';
                 }
 
                 let rowsHtml = "";
@@ -128,45 +203,38 @@
                     const ok = l.status_code === 200;
                     const dateObj = new Date(l.checked_at);
                     const formattedTime = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-                    const codeColor = ok ? "bg-emerald-950 text-emerald-400 border border-emerald-800/30" : "bg-rose-950 text-rose-400 border border-rose-800/30";
+                    const codeClass = ok ? "pill-up" : "pill-down";
                     const latencyDisplay = l.latency_ms ? l.latency_ms + "ms" : "-";
 
-                    rowsHtml += '<tr class="text-xs hover:bg-slate-900/60 border-b border-slate-900 transition-colors">' +
-                                    '<td class="p-3 text-slate-400 font-mono font-medium">' + formattedTime + '</td>' +
-                                    '<td class="p-3 font-semibold text-slate-300">' + l.region.replace(/_/g, ' ') + '</td>' +
-                                    '<td class="p-3">' +
-                                        '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold ' + codeColor + '">' +
-                                            (l.status_code || "FAIL") +
-                                        '</span>' +
-                                    '</td>' +
-                                    '<td class="p-3 text-slate-300 font-mono">' + latencyDisplay + '</td>' +
-                                    '<td class="p-3 text-slate-400 max-w-[200px] truncate font-medium">' + l.remarks + '</td>' +
+                    rowsHtml += '<tr>' +
+                                    '<td style="color:#64748b;font-family:monospace;">' + formattedTime + '</td>' +
+                                    '<td style="font-weight:600;">' + l.region.replace(/_/g, ' ') + '</td>' +
+                                    '<td><span class="code-pill ' + codeClass + '">' + (l.status_code || "FAIL") + '</span></td>' +
+                                    '<td style="font-family:monospace;">' + latencyDisplay + '</td>' +
+                                    '<td style="color:#64748b;">' + l.remarks + '</td>' +
                                 '</tr>';
                 });
 
-                const blockHtml = '<div class="bg-slate-900 rounded-2xl border border-slate-800/80 shadow-lg p-5 sm:p-6 overflow-hidden">' +
-                                    '<div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-5 gap-4">' +
-                                        '<h2 class="text-lg font-bold text-white tracking-wide truncate max-w-[70%] select-all hover:text-indigo-400 transition-colors">' + url + '</h2>' +
+                const blockHtml = '<div class="site-block">' +
+                                    '<div class="site-header">' +
+                                        '<h2 class="site-title">' + url + '</h2>' +
                                         '<div>' + masterBadge + '</div>' +
                                     '</div>' +
-                                    '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-5">' + nodesHtml + '</div>' +
-                                    '<details class="group border border-slate-800/60 rounded-xl bg-slate-950/40 overflow-hidden">' +
-                                        '<summary class="list-none flex justify-between items-center p-3.5 text-xs font-bold text-slate-400 cursor-pointer select-none hover:bg-slate-900/30 transition-colors">' +
-                                            '<span class="flex items-center gap-2">📑 Operational Inspection Audit Logs</span>' +
-                                            '<span class="text-[10px] text-slate-500 group-open:rotate-180 transition-transform duration-200">▼</span>' +
-                                        '</summary>' +
-                                        '<div class="overflow-x-auto border-t border-slate-900">' +
-                                            '<table class="w-full text-left table-auto">' +
+                                    '<div class="grid">' + nodesHtml + '</div>' +
+                                    '<details>' +
+                                        '<summary>📑 Operational Inspection Audit Logs</summary>' +
+                                        '<div style="overflow-x:auto;">' +
+                                            '<table>' +
                                                 '<thead>' +
-                                                    '<tr class="text-[10px] uppercase font-black text-slate-500 border-b border-slate-900 tracking-wider bg-slate-950">' +
-                                                        '<th class="p-3">Time</th>' +
-                                                        '<th class="p-3">Probe Source</th>' +
-                                                        '<th class="p-3">HTTP Status</th>' +
-                                                        '<th class="p-3">Ping Latency</th>' +
-                                                        '<th class="p-3">Telemetry Context Metadata</th>' +
+                                                    '<tr>' +
+                                                        '<th>Time</th>' +
+                                                        '<th>Probe Source</th>' +
+                                                        '<th>HTTP Status</th>' +
+                                                        '<th>Ping Latency</th>' +
+                                                        '<th>Metadata Summary</th>' +
                                                     '</tr>' +
                                                 '</thead>' +
-                                                '<tbody class="divide-y divide-slate-900/40 bg-slate-950/20">' + rowsHtml + '</tbody>' +
+                                                '<tbody>' + rowsHtml + '</tbody>' +
                                             '</table>' +
                                         '</div>' +
                                     '</details>' +
@@ -179,4 +247,3 @@
     </script>
 </body>
 </html>
-    
