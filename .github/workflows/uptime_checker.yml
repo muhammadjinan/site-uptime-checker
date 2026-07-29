@@ -1,9 +1,12 @@
 name: Global Site Status Checker
 
 on:
-  schedule:
-    - cron: '*/30 * * * *'
   workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'The URL to test globally'
+        required: true
+        default: 'https://example.com'
 
 jobs:
   check-global:
@@ -34,9 +37,6 @@ jobs:
 
     - name: Run Status Checker
       env:
-        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        # ADD ALL SITES YOU WANT TO TRACK HERE, SEPARATED BY COMMAS
-        TARGET_URL: "https://autogestion.magyp.gob.ar/, https://autogestion.magyp.gob.ar, https://github.com, https://google.com"
+        TARGET_URL: ${{ github.event.inputs.target_url }}
         RUNNER_REGION: ${{ matrix.region }}
       run: python checker.py
