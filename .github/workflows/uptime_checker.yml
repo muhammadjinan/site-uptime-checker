@@ -1,0 +1,41 @@
+name: Global Site Status Checker
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  check-global:
+    name: Check from ${{ matrix.region }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            region: "US_EAST_OR_WEST"
+          - os: windows-latest
+            region: "US_CENTRAL_OR_EU"
+          - os: macos-latest
+            region: "GLOBAL_SECONDARY"
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install Dependencies
+      run: pip install requests
+
+    - name: Run Status Checker
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        TARGET_URL: "https://google.com" # CHANGE THIS to whatever site you want to watch!
+        RUNNER_REGION: ${{ matrix.region }}
+      run: python checker.py
