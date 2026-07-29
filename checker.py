@@ -41,6 +41,7 @@ def check_site():
             remarks = "Possible Geo-Block Text Detected"
         elif status in:
             remarks = "Restricted / Forbidden"
+
             
         log_to_supabase(status, latency, remarks)
         print(f"[{REGION}] Status: {status} | Latency: {latency}ms | {remarks}")
