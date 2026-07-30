@@ -3,30 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Global Site Checker</title>
-    <!-- Dynamically linking your new standalone stylesheet file -->
+    <title>Global Status Records Lookup</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="wrapper">
         <header>
-            <h1>On-Demand Global Checker</h1>
-            <p>Type any target domain to trigger live multi-region edge node requests</p>
+            <h1>Global Status Archive Search</h1>
+            <p>Look up any previously monitored site to view its latest regional edge metrics and scan timestamps</p>
         </header>
 
         <div class="search-box">
+            <!-- Modified button onclick handler to link directly to our new search engine logic -->
             <input type="text" id="url-input" placeholder="https://example.com" value="https://">
-            <button id="check-btn" onclick="triggerLiveCheck()">Run Diagnostics</button>
+            <button id="check-btn" onclick="searchTestedUrl()">Search Database</button>
         </div>
 
         <div id="status-display" class="status-container">
-            <h3 id="checking-headline" style="margin: 0; font-size: 18px;">Analyzing Endpoint...</h3>
+            <h3 id="checking-headline" style="margin: 0; font-size: 16px; font-weight: bold; line-height: 1.5;">Querying Vault...</h3>
             <div class="grid" id="nodes-grid"></div>
         </div>
     </div>
 
-    <!-- Dynamically linking your standalone javascript functionality engine -->
     <script src="app.js"></script>
 </body>
 </html>
