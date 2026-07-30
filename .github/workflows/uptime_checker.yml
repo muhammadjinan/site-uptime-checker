@@ -37,6 +37,9 @@ jobs:
 
     - name: Run Status Checker
       env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         TARGET_URL: ${{ github.event.inputs.target_url }}
         RUNNER_REGION: ${{ matrix.region }}
       run: python checker.py
+
