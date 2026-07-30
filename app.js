@@ -248,22 +248,34 @@ testBtn.addEventListener('click', async () => {
     return;
   }
 
-  // 1. Lock the UI and show the spinner
+  // 1. Lock UI
   testBtn.disabled = true;
   urlInput.disabled = true;
   pollingStatus.classList.remove('hidden');
   statusText.innerText = "Dispatching workflow to GitHub Actions...";
 
-  // Record the exact time we started the test (so we don't pull old data)
   const testStartTime = new Date().toISOString();
 
   try {
-    // 2. Call the Supabase Edge Function (Fire and Forget)
-    const { data, error } = await supabase.functions.invoke('trigger-github-action', {
-      body: { target_url: targetUrl }
-    });
+    // 2. Direct fetch call to your deployed Supabase Edge Function
+    // NOTE: Make sure SUPABASE_ANON_KEY matches your existing key variable name in app.js
+    const response = await fetch(
+      'https://oqemerijdbximspphlgz.supabase.co/functions/v1/trigger-github-action',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'apikey': SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({ target_url: targetUrl })
+      }
+    );
 
-    if (error) throw error;
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.error || 'Failed to trigger workflow');
+    }
 
     statusText.innerText = "Test running on Azure infrastructure. Waiting for results...";
     
@@ -272,7 +284,7 @@ testBtn.addEventListener('click', async () => {
 
   } catch (err) {
     console.error("Error triggering test:", err);
-    statusText.innerText = "Error: Could not start test. Check console.";
+    statusText.innerText = `Error: ${err.message || 'Could not start test'}`;
     resetUI();
   }
 });
