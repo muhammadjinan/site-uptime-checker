@@ -20,66 +20,69 @@
 
     <!-- 1. Search Historical Database Panel -->
     <div class="search-box">
-      <input 
-        type="text" 
-        id="url-input" 
-        placeholder="Search URL (defaults to https://, specify http:// if needed)..." 
-      />
-      <button id="check-btn" onclick="searchTestedUrl()">Search Database</button>
+        <input 
+            type="text" 
+            id="url-input" 
+            placeholder="Search URL (defaults to https://, specify http:// if needed)..." 
+        />
+        <button id="check-btn" onclick="searchTestedUrl()">Search Database</button>
     </div>
 
     <!-- 2. Live Global Diagnostics Panel -->
     <div class="test-panel">
-      <h3>⚡ Run Live Global Diagnostics</h3>
-      
-      <div class="input-group">
-        <input 
-          type="text" 
-          id="live-url-input" 
-          placeholder="example.com (defaults to https:// — specify http:// manually if required)" 
-        />
-        <button id="test-btn" class="primary-btn">Initialize Test</button>
-      </div>
+        <h3>⚡ Run Live Global Diagnostics</h3>
+        
+        <div class="input-group">
+            <input 
+                type="text" 
+                id="live-url-input" 
+                placeholder="example.com (defaults to https:// — specify http:// manually if required)" 
+                required
+            />
+            <button id="live-test-btn" class="primary-btn">Initialize Test</button>
+        </div>
 
-      <!-- Micro-copy hint inside the panel -->
-      <small style="color: #64748b; display: block; margin-top: 8px; font-size: 12px;">
-        💡 Defaults to <code>https://</code> if omitted. Specify <code>http://</code> explicitly for unencrypted targets.
-      </small>
+        <!-- Micro-copy hint -->
+        <small style="color: #64748b; display: block; margin-top: 8px; font-size: 12px;">
+            💡 Defaults to <code>https://</code> if omitted. Specify <code>http://</code> explicitly for unencrypted targets.
+        </small>
 
-      <!-- Polling / Progress Status Bar -->
-      <div id="polling-status" class="hidden" style="margin-top: 12px;">
-        <div class="spinner"></div>
-        <span id="checking-headline">Initializing workflow...</span>
-      </div>
+        <!-- Polling / Progress Status Bar -->
+        <div id="polling-status" class="hidden" style="margin-top: 12px;">
+            <div class="spinner"></div>
+            <span id="status-text">Connecting to Azure runners...</span>
+        </div>
     </div>
 
-    <!-- 3. Grid Header & Grid Container for Site Cards -->
-    <h3 id="grid-title" style="margin: 28px 0 14px 0; font-size: 16px; font-weight: 700;">Latest 9 Site Evaluations</h3>
-    <div id="grid" class="grid">
-        <!-- Site evaluation cards are dynamically rendered here by app.js -->
+    <!-- 3. Dashboard Grid Container -->
+    <div id="status-display" class="status-container" style="display: block;">
+        <h3 id="checking-headline" style="margin: 28px 0 16px 0; font-size: 16px; font-weight: bold; line-height: 1.5;">
+            Fetching latest 9 site evaluations...
+        </h3>
+        <div class="grid" id="nodes-grid"></div>
     </div>
 
     <!-- 4. Infrastructure Footer Info -->
     <footer class="runner-info">
         <h4>Runner Infrastructure Routing</h4>
-        <p>Monitoring nodes operate via GitHub Actions on Microsoft Azure data centers. Physical execution locations are dynamically allocated based on the OS matrix:</p>
+        <p>Monitoring nodes operate via GitHub Actions on Microsoft Azure data centers[cite: 1]. Physical execution locations are dynamically allocated based on the OS matrix[cite: 1]:</p>
         <ul>
-            <li><strong>US_EAST_OR_WEST</strong> (Ubuntu): Typically routes to Azure East US 2 (Virginia) or West US 2.</li>
-            <li><strong>US_CENTRAL_OR_EU</strong> (Windows): Balances across Central US, East US, or West Europe.</li>
-            <li><strong>GLOBAL_SECONDARY</strong> (macOS): Runs on dedicated Apple Silicon/Intel racks located in South Central US, East US, or West Europe.</li>
+            <li><strong>US_EAST_OR_WEST (Ubuntu):</strong> Typically routes to Azure East US 2 (Virginia) or West US 2[cite: 1].</li>
+            <li><strong>US_CENTRAL_OR_EU (Windows):</strong> Balances across Central US, East US, or West Europe[cite: 1].</li>
+            <li><strong>GLOBAL_SECONDARY (macOS):</strong> Runs on dedicated Apple Silicon/Intel racks located in South Central US, East US, or West Europe[cite: 1].</li>
         </ul>
     </footer>
 </div>
 
-<!-- 5. Telemetry Pop-Up Modal Container -->
-<div id="detail-modal" class="modal-backdrop" style="display: none;">
+<!-- 5. Technical Details Modal Pop-up -->
+<div id="detail-modal" class="modal-backdrop" onclick="closeModalOnBackdrop(event)" style="display: none;">
     <div class="modal-card">
         <div class="modal-header">
-            <h3>Diagnostic Telemetry</h3>
+            <h3 id="modal-title">Telemetry Inspection</h3>
             <span class="modal-close" onclick="closeModal()">&times;</span>
         </div>
-        <div id="modal-content">
-            <!-- Polling results or detailed card telemetry injects here -->
+        <div class="modal-body" id="modal-content">
+            <!-- Dynamically populated by app.js -->
         </div>
     </div>
 </div>
