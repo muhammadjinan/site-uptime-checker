@@ -294,13 +294,17 @@ function startPolling(targetUrl, testStartTime) {
   let attempts = 0;
   const maxAttempts = 30; 
   const pollIntervalMs = 4000;
+  
+  // Clean the target URL to match how your DB stores it (remove trailing slash)
+  const cleanTarget = targetUrl.replace(/\/$/, "").toLowerCase();
 
   const intervalId = setInterval(async () => {
     attempts++;
     statusText.innerText = `Checking database for results (${attempts}/${maxAttempts})...`;
 
     try {
-      const pollUrl = SUPABASE_URL + "/rest/v1/site_checks?order=checked_at.desc&limit=1";
+      // Fetch the top 10 most recent records to ensure we don't miss anything
+      const pollUrl = SUPABASE_URL + "/rest/v1/site_checks?order=checked_at.desc&limit=10";
       
       const response = await fetch(pollUrl, {
           headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY }
@@ -310,26 +314,28 @@ function startPolling(targetUrl, testStartTime) {
 
       const data = await response.json();
 
-      if (data && data.length > 0) {
-        const latestRecord = data[0];
-        const recordTime = new Date(latestRecord.checked_at).getTime();
-        const startTime = new Date(bufferedStartTime).getTime();
-
-        if (recordTime >= startTime) {
-          console.log("🎉 New test result detected in database!", latestRecord);
-          clearInterval(intervalId);
-          statusText.innerText = "Test completed successfully!";
+      // Filter the incoming data: Must be the correct URL AND created after we started the test
+      const newResults = data.filter(row => {
+          const recordTime = new Date(row.checked_at).getTime();
+          const startTime = new Date(bufferedStartTime).getTime();
+          const isRecent = recordTime >= startTime;
+          const matchesUrl = row.url.toLowerCase().includes(cleanTarget);
           
-          // 1. Refresh grid data
-          await fetchLatestTests();
+          return isRecent && matchesUrl;
+      });
 
-          // 2. Automatically open the telemetry modal for the new result (first card)
-          openModal(0);
+      // 🎯 Wait until ALL 3 regional checks are in the database
+      if (newResults.length >= 3) {
+        console.log("🎉 All 3 regional tests completed!", newResults);
+        clearInterval(intervalId);
+        statusText.innerText = "Global diagnostic complete!";
+        
+        // Populate the top search box and trigger your existing search function
+        document.getElementById("url-input").value = targetUrl;
+        await searchTestedUrl(); 
 
-          // 3. Reset the top UI & hide the spinner status box
-          resetUI();
-          return;
-        }
+        resetUI();
+        return;
       }
 
       if (attempts >= maxAttempts) {
