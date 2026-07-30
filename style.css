@@ -122,6 +122,23 @@ button:disabled{
 }
 
 /* ========================================= */
+/* Deprioritized Search Button Style */
+/* ========================================= */
+
+#check-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition: all 0.15s ease;
+}
+
+#check-btn:hover {
+    background: var(--surface-hover);
+    border-color: #484f58;
+    color: var(--text);
+}
+
+/* ========================================= */
 
 .status-container{
     display:none;
