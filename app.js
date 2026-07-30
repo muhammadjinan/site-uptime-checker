@@ -304,17 +304,19 @@ function startPolling(targetUrl, testStartTime) {
     statusText.innerText = `Checking database for results (${attempts}/${maxAttempts})...`;
 
     try {
-      // Query the latest check from the database without filtering by exact URL first
-      const { data, error } = await dbQueryUrl
-        .from('site_checks')
-        .select('*')
-        .order('checked_at', { ascending: false })
-        .limit(1);
+      // Query the latest check using the same REST method as the rest of your app
+      const pollUrl = SUPABASE_URL + "/rest/v1/site_checks?order=checked_at.desc&limit=1";
+      
+      const response = await fetch(pollUrl, {
+          headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY }
+      });
 
-      if (error) {
-        console.error("❌ [Polling Query Error]:", error);
+      if (!response.ok) {
+        console.error("❌ [Polling Query Error]:", await response.text());
         return;
       }
+
+      const data = await response.json();
 
       console.log(`📡 [Attempt ${attempts}] Latest DB record:`, data ? data[0] : "No records");
 
@@ -330,15 +332,7 @@ function startPolling(targetUrl, testStartTime) {
           statusText.innerText = "Test completed successfully!";
           
           // Re-fetch the page data/grid
-          if (typeof loadSiteChecks === 'function') {
-            loadSiteChecks();
-          } else if (typeof fetchLatestResults === 'function') {
-            fetchLatestResults();
-          } else {
-            console.warn("⚠️ Grid reload function not triggered. Check function name in app.js");
-            // Fallback: manually reload the data list if your app uses a specific render function
-            location.reload(); 
-          }
+          fetchLatestTests();
 
           resetUI();
           return;
