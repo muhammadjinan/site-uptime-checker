@@ -17,6 +17,12 @@
 
         <!-- Search Action -->
         <div class="search-box">
+            <!-- Search Input -->
+            <input 
+              type="text" 
+              id="url-input" 
+              placeholder="Search URL (defaults to https://, specify http:// if needed)..." 
+            />
             <input type="text" id="url-input" placeholder="Search a specific URL... (e.g., https://example.com)">
             <button id="check-btn" onclick="searchTestedUrl()">Search Database</button>
         </div>
@@ -24,6 +30,12 @@
         <!-- Live Test Control Panel -->
         <div class="test-panel">
           <h3>⚡ Run Live Global Diagnostics</h3>
+            <!-- Live Test Input -->
+            <input 
+              type="text" 
+              id="live-url-input" 
+              placeholder="example.com (defaults to https:// — include http:// manually if required)" 
+            />
           <div class="input-group">
             <input type="url" id="live-url-input" placeholder="https://example.com" required>
             <button id="live-test-btn" class="primary-btn">Initialize Test</button>
@@ -34,6 +46,10 @@
             <span id="status-text">Connecting to Azure runners...</span>
           </div>
         </div>
+
+        <small style="color: #64748b; display: block; margin-top: 6px; font-size: 12px;">
+          💡 Defaults to <code>https://</code> if omitted. Specify <code>http://</code> explicitly for unencrypted targets.
+        </small>
 
         <!-- Dashboard Grid -->
         <div id="status-display" class="status-container" style="display: block;">
