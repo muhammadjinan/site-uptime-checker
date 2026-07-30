@@ -20,6 +20,20 @@
             <button id="check-btn" onclick="searchTestedUrl()">Search Database</button>
         </div>
 
+        <!-- Live Test Control Panel -->
+        <div class="test-panel">
+          <h3>⚡ Run Live Global Diagnostics</h3>
+          <div class="input-group">
+            <input type="url" id="live-url-input" placeholder="https://example.com" required>
+            <button id="live-test-btn" class="primary-btn">Initialize Test</button>
+          </div>
+          <!-- Hidden by default, shows during polling -->
+          <div id="polling-status" class="hidden">
+            <span class="spinner"></span>
+            <span id="status-text">Connecting to Azure runners...</span>
+          </div>
+        </div>
+
         <!-- Dashboard Grid -->
         <div id="status-display" class="status-container" style="display: block;">
             <h3 id="checking-headline" style="margin: 0 0 16px 0; font-size: 16px; font-weight: bold; line-height: 1.5;">Fetching latest 9 site evaluations...</h3>
