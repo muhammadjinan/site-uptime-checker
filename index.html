@@ -111,11 +111,10 @@
             <div class="grid" id="nodes-grid"></div>
         </div>
     </div>
-    <script>
+        <script>
         // Project routing constants
         const GH_USER = "muhammadjinan"; 
         const GH_REPO = "site-uptime-checker";
-        const WORKFLOW_ID = "uptime_checker.yml";
 
         let pollInterval = null;
 
@@ -130,14 +129,14 @@
 
             // Lock the input screen UI parameters
             btn.disabled = true;
-            btn.innerText = "Spawning Nodes...";
+            btn.innerText = "Monitoring...";
             
             const display = document.getElementById("status-display");
             const headline = document.getElementById("checking-headline");
             const grid = document.getElementById("nodes-grid");
             
             display.style.display = "block";
-            headline.innerText = "Requesting infrastructure for " + urlInput + "...";
+            headline.innerText = "Please trigger the workflow in GitHub for: " + urlInput;
             
             // Build the initial loading layout nodes
             const regions = ["US EAST OR WEST", "US CENTRAL OR EU", "GLOBAL SECONDARY"];
@@ -148,38 +147,45 @@
                                         '<span class="card-title">' + r + '</span>' +
                                         '<span class="dot dot-running"></span>' +
                                     '</div>' +
-                                    '<div class="metric"><span class="label">Status:</span><span class="value" style="color:#eab308;">Deploying...</span></div>' +
+                                    '<div class="metric"><span class="label">Status:</span><span class="value" style="color:#eab308;">Waiting for GitHub...</span></div>' +
                                     '<div class="metric"><span class="label">Latency:</span><span class="value">--</span></div>' +
                                 '</div>';
             });
 
-            // Trigger workflow securely via a GitHub repository dispatch event shortcut
-            // Since tokens cannot sit on the frontend, users must click the Actions tab button or we can map a webhook dispatch later.
-            headline.innerText = "Servers connected. Streaming edge records for " + urlInput + "...";
-            setTimeout(() => { startPollingLogs(urlInput); }, 2000);
+            // Start looking for any active run immediately
+            startPollingLogs();
         }
-        async function startPollingLogs(urlInput) {
-            const runUrl = 'https://github.com' + GH_USER + '/' + GH_REPO + '/actions/runs?event=workflow_dispatch&limit=1';
+        async function startPollingLogs() {
+            const runUrl = 'https://github.com' + GH_USER + '/' + GH_REPO + '/actions/runs?per_page=1';
             let attempts = 0;
 
             pollInterval = setInterval(async () => {
                 attempts++;
-                if (attempts > 30) {
+                
+                if (attempts > 45) {
                     clearInterval(pollInterval);
-                    document.getElementById("checking-headline").innerText = "Diagnostics timed out.";
+                    document.getElementById("checking-headline").innerText = "Diagnostics timed out waiting for workflow completion.";
                     document.getElementById("check-btn").disabled = false;
                     document.getElementById("check-btn").innerText = "Run Diagnostics";
                     return;
                 }
 
                 try {
-                    const res = await fetch(runUrl, {
-                        headers: { 'Accept': 'application/vnd.github.v3+json' }
-                    });
+                    const res = await fetch(runUrl, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
                     const data = await res.json();
                     
                     if (data.workflow_runs && data.workflow_runs.length > 0) {
                         const latestRun = data.workflow_runs[0];
+                        const headline = document.getElementById("checking-headline");
+                        
+                        if (latestRun.status === "in_progress" || latestRun.status === "queued") {
+                            headline.innerText = "🌐 Global servers active! Streaming results dynamically...";
+                            
+                            const statusValues = document.querySelectorAll(".metric .value");
+                            statusValues.forEach(val => {
+                                if(val.innerText.includes("Waiting")) val.innerText = "Probing Target...";
+                            });
+                        }
                         
                         if (latestRun.status === "completed") {
                             clearInterval(pollInterval);
@@ -187,7 +193,7 @@
                         }
                     }
                 } catch (e) {
-                    console.error("Log tracking polling error:", e);
+                    console.error("Telemetry channel polling interruption:", e);
                 }
             }, 4000);
         }
@@ -198,9 +204,7 @@
             const jobsUrl = 'https://github.com' + GH_USER + '/' + GH_REPO + '/actions/runs/' + runId + '/jobs';
 
             try {
-                const res = await fetch(jobsUrl, {
-                    headers: { 'Accept': 'application/vnd.github.v3+json' }
-                });
+                const res = await fetch(jobsUrl, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
                 const data = await res.json();
                 
                 if (data.jobs) {
@@ -218,12 +222,12 @@
                                 card.querySelector(".value").className = "value text-up";
                             } else {
                                 dot.classList.add("dot-down");
-                                card.querySelector(".value").innerText = "Blocked / Timeout";
+                                card.querySelector(".value").innerText = "Blocked / Outage";
                                 card.querySelector(".value").className = "value text-down";
                             }
                         }
                     });
-                    headline.innerText = "Diagnostics Complete.";
+                    headline.innerText = "✅ Diagnostics Complete.";
                 }
             } catch (err) {
                 headline.innerText = "Failed to parse final server outputs.";
