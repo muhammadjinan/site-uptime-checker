@@ -290,12 +290,13 @@ testBtn.addEventListener('click', async () => {
 });
 
 function startPolling(targetUrl, testStartTime) {
+  // 30-second buffer for server time differences
   const bufferedStartTime = new Date(new Date(testStartTime).getTime() - 30000).toISOString();
   let attempts = 0;
   const maxAttempts = 30; 
   const pollIntervalMs = 4000;
   
-  // Clean the target URL to match how your DB stores it (remove trailing slash)
+  // Clean the target URL to match how your DB stores it
   const cleanTarget = targetUrl.replace(/\/$/, "").toLowerCase();
 
   const intervalId = setInterval(async () => {
@@ -314,26 +315,49 @@ function startPolling(targetUrl, testStartTime) {
 
       const data = await response.json();
 
-      // Filter the incoming data: Must be the correct URL AND created after we started the test
+      // STRICT FILTER: Must match the URL AND be created after we clicked the test button
       const newResults = data.filter(row => {
           const recordTime = new Date(row.checked_at).getTime();
           const startTime = new Date(bufferedStartTime).getTime();
-          const isRecent = recordTime >= startTime;
-          const matchesUrl = row.url.toLowerCase().includes(cleanTarget);
           
-          return isRecent && matchesUrl;
+          return (recordTime >= startTime) && row.url.toLowerCase().includes(cleanTarget);
       });
 
-      // 🎯 Wait until ALL 3 regional checks are in the database
+      // 🎯 PATIENCE CHECK: Wait until exactly 3 (or more) regional checks have arrived
       if (newResults.length >= 3) {
         console.log("🎉 All 3 regional tests completed!", newResults);
         clearInterval(intervalId);
         statusText.innerText = "Global diagnostic complete!";
         
-        // Populate the top search box and trigger your existing search function
-        document.getElementById("url-input").value = targetUrl;
-        await searchTestedUrl(); 
+        // 1. Refresh the background grid so it's up-to-date
+        await fetchLatestTests();
 
+        // 2. Build a custom multi-result view for the Pop-up Modal
+        let modalHtml = `<div style="margin-bottom: 16px;">
+                            <span style="color:#94a3b8; font-size:12px;">Global Diagnostic Results for:</span><br>
+                            <strong style="color:#60a5fa; font-size:16px; word-break:break-all;">${targetUrl}</strong>
+                         </div>`;
+        
+        // Loop through all 3 results and create a mini-card for each inside the modal
+        newResults.slice(0, 3).forEach(row => {
+          const geoInfo = evaluateGeoRestriction(row.url, row.status_code, row.remarks);
+          const statusColor = row.status_code === 200 ? '#4ade80' : '#ef4444';
+          
+          modalHtml += `
+            <div style="border-left: 4px solid ${statusColor}; background: rgba(255,255,255,0.05); padding: 12px; margin-bottom: 12px; border-radius: 6px;">
+              <div class="modal-row"><span class="key">Region:</span><span class="val" style="font-weight:bold;">${row.region.replace(/_/g, ' ')}</span></div>
+              <div class="modal-row"><span class="key">Status:</span><span class="val">${formatHttpStatus(row.status_code)}</span></div>
+              <div class="modal-row"><span class="key">Latency:</span><span class="val">${row.latency_ms ? row.latency_ms + ' ms' : 'N/A'}</span></div>
+              ${geoInfo.isGeoRestricted ? `<div class="geo-badge" style="margin-top:8px; font-size:12px; padding:6px;">⚠️ ${geoInfo.message}</div>` : ''}
+            </div>
+          `;
+        });
+
+        // 3. Inject the HTML and open the modal
+        document.getElementById("modal-content").innerHTML = modalHtml;
+        document.getElementById("detail-modal").style.display = "flex";
+
+        // 4. Reset the UI
         resetUI();
         return;
       }
@@ -348,7 +372,6 @@ function startPolling(targetUrl, testStartTime) {
     }
   }, pollIntervalMs);
 }
-
 function resetUI() {
   testBtn.disabled = false;
   urlInput.disabled = false;
