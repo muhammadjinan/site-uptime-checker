@@ -27,6 +27,25 @@
         </div>
     </div>
 
+    <!-- Dashboard Grid (Existing code) -->
+        <div id="status-display" class="status-container" style="display: block;">
+            <h3 id="checking-headline" style="margin: 0 0 16px 0; font-size: 16px; font-weight: bold; line-height: 1.5;">Fetching latest 9 site evaluations...</h3>
+            <div class="grid" id="nodes-grid"></div>
+        </div>
+
+        <!-- NEW: Unobtrusive Footer -->
+        <footer class="runner-info">
+            <h4>Runner Infrastructure Routing</h4>
+            <p>Monitoring nodes operate via GitHub Actions on Microsoft Azure data centers[cite: 1]. Physical execution locations are dynamically allocated based on the OS matrix[cite: 1]:</p>
+            <ul>
+                <li><strong>US_EAST_OR_WEST (Ubuntu):</strong> Typically routes to Azure East US 2 (Virginia) or West US 2[cite: 1].</li>
+                <li><strong>US_CENTRAL_OR_EU (Windows):</strong> Balances across Central US, East US, or West Europe[cite: 1].</li>
+                <li><strong>GLOBAL_SECONDARY (macOS):</strong> Runs on dedicated Apple Silicon/Intel racks located in South Central US, East US, or West Europe[cite: 1].</li>
+            </ul>
+        </footer>
+
+    </div> <!-- End of .wrapper -->
+
     <!-- Technical Details Modal Pop-up -->
     <div id="detail-modal" class="modal-backdrop" onclick="closeModalOnBackdrop(event)">
         <div class="modal-card">
