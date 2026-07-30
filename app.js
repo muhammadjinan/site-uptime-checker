@@ -305,7 +305,7 @@ function startPolling(targetUrl, testStartTime) {
 
     try {
       // Query the latest check from the database without filtering by exact URL first
-      const { data, error } = await supabase
+      const { data, error } = await dbQueryUrl
         .from('site_checks')
         .select('*')
         .order('checked_at', { ascending: false })
