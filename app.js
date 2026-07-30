@@ -289,48 +289,56 @@ testBtn.addEventListener('click', async () => {
   }
 });
 
-function startPolling(targetUrl, startTime) {
+function startPolling(targetUrl, testStartTime) {
+  // 1. Subtract 10 seconds from testStartTime to prevent clock drift issues
+  const bufferedStartTime = new Date(new Date(testStartTime).getTime() - 10000).toISOString();
+  
   let attempts = 0;
+  const maxAttempts = 30; // 30 attempts * 4 seconds = 120 seconds (2 minutes max)
+  const pollIntervalMs = 4000; // Check every 4 seconds
 
-  pollInterval = setInterval(async () => {
+  const intervalId = setInterval(async () => {
     attempts++;
     
-    // Safety fallback: If it takes longer than 75 seconds, stop polling
-    if (attempts > MAX_POLL_ATTEMPTS) {
-      clearInterval(pollInterval);
-      statusText.innerText = "Test timed out or took too long. Please refresh the page later.";
-      resetUI();
-      return;
-    }
+    // Update status text so user sees live progress
+    statusText.innerText = `GitHub Action is running... checking database (${attempts}/${maxAttempts})`;
 
     try {
-      // Query the database for results matching the URL that were created AFTER we clicked the button
-      const { data: newResults, error } = await supabase
-        .from('site_checks') // Actual Supabase table name!
+      // Query Supabase for a check entry matching the target URL after buffered start time
+      const { data, error } = await supabase
+        .from('site_checks') // Replace with your exact table name if different
         .select('*')
-        .eq('url', targetUrl)
-        .gte('created_at', startTime);
+        .eq('url', targetUrl) // Replace 'url' with your exact column name if different
+        .gte('checked_at', bufferedStartTime) // Replace 'checked_at' if your column is named differently
+        .order('checked_at', { ascending: false })
+        .limit(1);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Polling error:", error);
+        return;
+      }
 
-      // If we found at least 3 rows (assuming 3 regions tested per URL)
-      if (newResults && newResults.length >= 3) {
-        clearInterval(pollInterval);
-        statusText.innerText = "Test complete! Updating dashboard...";
+      // If a new row is found!
+      if (data && data.length > 0) {
+        clearInterval(intervalId);
+        statusText.innerText = "Test completed successfully!";
         
-        // Call your existing function to refresh the dashboard grid
-        // e.g., fetchLatestResults(); 
+        // Refresh your dashboard grid/table with the new data
+        if (typeof fetchLatestResults === 'function') {
+          fetchLatestResults();
+        }
         
-        setTimeout(() => {
-          pollingStatus.classList.add('hidden');
-          resetUI();
-          urlInput.value = ''; // Clear the input
-        }, 2000);
+        resetUI();
+      } else if (attempts >= maxAttempts) {
+        // Stop polling after 2 minutes
+        clearInterval(intervalId);
+        statusText.innerText = "Test took longer than expected. Please refresh the page in a moment.";
+        resetUI();
       }
     } catch (err) {
-      console.error("Error polling database:", err);
+      console.error("Polling loop error:", err);
     }
-  }, 3000); // Poll every 3 seconds
+  }, pollIntervalMs);
 }
 
 function resetUI() {
