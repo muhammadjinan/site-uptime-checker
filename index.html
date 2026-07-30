@@ -3,26 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Status Records Lookup</title>
+    <title>Global Status Archive</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div class="wrapper">
         <header>
             <h1>Global Status Archive</h1>
-            <p>Viewing the latest regional edge metrics and scan timestamps</p>
+            <p>Viewing latest edge metrics, HTTP telemetry, and regional routing status</p>
         </header>
 
-        <!-- Secondary Search Action -->
+        <!-- Search Action -->
         <div class="search-box">
             <input type="text" id="url-input" placeholder="Search a specific URL... (e.g., https://example.com)">
             <button id="check-btn" onclick="searchTestedUrl()">Search Database</button>
         </div>
 
-        <!-- Primary Display for Recent or Searched URLs -->
+        <!-- Dashboard Grid -->
         <div id="status-display" class="status-container" style="display: block;">
-            <h3 id="checking-headline" style="margin: 0; font-size: 16px; font-weight: bold; line-height: 1.5;">Fetching latest 9 tests...</h3>
+            <h3 id="checking-headline" style="margin: 0 0 16px 0; font-size: 16px; font-weight: bold; line-height: 1.5;">Fetching latest 9 site evaluations...</h3>
             <div class="grid" id="nodes-grid"></div>
+        </div>
+    </div>
+
+    <!-- Technical Details Modal Pop-up -->
+    <div id="detail-modal" class="modal-backdrop" onclick="closeModalOnBackdrop(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title">Telemetry Inspection</h3>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modal-content">
+                <!-- Dynamically populated -->
+            </div>
         </div>
     </div>
 
