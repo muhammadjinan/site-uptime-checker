@@ -32,15 +32,12 @@ body{
     padding:28px;
     background:var(--bg);
     color:var(--text);
-
     font-family:
         Inter,
         "Segoe UI",
         Roboto,
         sans-serif;
-
     line-height:1.45;
-
     -webkit-font-smoothing:antialiased;
 }
 
@@ -75,41 +72,27 @@ p{
 .search-box{
     display:flex;
     gap:10px;
-
     margin-bottom:22px;
-
     padding:14px;
-
     background:var(--surface);
-
     border:1px solid var(--border);
-
     border-radius:var(--radius);
 }
 
 input{
     flex:1;
-
     padding:11px 14px;
-
     background:var(--bg);
-
     color:var(--text);
-
     border:1px solid var(--border);
-
     border-radius:4px;
-
     outline:none;
-
     font-size:14px;
-
     font-family:
         ui-monospace,
         SFMono-Regular,
         Consolas,
         monospace;
-
     transition:border-color .15s;
 }
 
@@ -119,19 +102,12 @@ input:focus{
 
 button{
     border:none;
-
     background:var(--button);
-
     color:#fff;
-
     padding:11px 18px;
-
     border-radius:4px;
-
     font-weight:600;
-
     cursor:pointer;
-
     transition:background .15s;
 }
 
@@ -160,35 +136,24 @@ button:disabled{
 /* ========================================= */
 
 .card{
-
     display:flex;
     flex-direction:column;
     justify-content:space-between;
-
     background:var(--surface);
-
     border:1px solid var(--border);
-
     border-left:4px solid #484f58;
-
     border-radius:6px;
-
     padding:16px;
-
     transition:
         background .15s,
         border-color .15s,
         transform .15s;
-
     cursor:pointer;
 }
 
 .card:hover{
-
     background:var(--surface-hover);
-
     border-color:#3d444d;
-
     transform:translateY(-1px);
 }
 
@@ -207,40 +172,26 @@ button:disabled{
 /* ========================================= */
 
 .card-header{
-
     display:flex;
-
     justify-content:space-between;
-
     align-items:flex-start;
-
     margin-bottom:12px;
-
     gap:8px;
 }
 
 .card-title{
-
     font-size:12px;
-
     font-weight:700;
-
     letter-spacing:.05em;
-
     color:var(--text);
-
     word-break:break-word;
 }
 
 .dot{
-
     width:8px;
     height:8px;
-
     border-radius:50%;
-
     flex-shrink:0;
-
     margin-top:5px;
 }
 
@@ -255,17 +206,11 @@ button:disabled{
 /* ========================================= */
 
 .metric{
-
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
-
     padding:5px 0;
-
     font-size:13px;
-
     border-bottom:1px solid rgba(255,255,255,.03);
 }
 
@@ -274,18 +219,15 @@ button:disabled{
 }
 
 .label{
-
     color:var(--muted);
 }
 
 .value{
-
     font-family:
         ui-monospace,
         SFMono-Regular,
         Consolas,
         monospace;
-
     font-weight:600;
 }
 
@@ -304,55 +246,35 @@ button:disabled{
 /* ========================================= */
 
 .geo-badge{
-
     margin-top:12px;
-
     padding:6px 8px;
-
     background:#241c0b;
-
     color:#d29922;
-
     border:1px solid #5c4815;
-
     border-radius:4px;
-
     font-size:11px;
-
     font-weight:600;
 }
 
 /* ========================================= */
 
 .inspect-btn{
-
     margin-top:14px;
-
     padding:8px;
-
     width:100%;
-
     background:#21262d;
-
     color:var(--muted);
-
     border:1px solid var(--border);
-
     border-radius:4px;
-
     font-size:12px;
-
     font-weight:600;
-
     transition:
         background .15s,
         color .15s;
 }
 
 .card:hover .inspect-btn{
-
     background:#30363d;
-
     color:var(--text);
 }
 
@@ -361,108 +283,71 @@ button:disabled{
 /* ========================================= */
 
 .modal-backdrop{
-
     display:none;
-
     position:fixed;
-
     inset:0;
-
     background:rgba(0,0,0,.72);
-
     z-index:1000;
-
     justify-content:center;
-
     align-items:center;
-
     padding:20px;
 }
 
 .modal-card{
-
     width:100%;
-
     max-width:560px;
-
     background:var(--surface);
-
     border:1px solid var(--border);
-
     border-radius:8px;
-
     padding:22px;
-
     animation:modalSlide .18s ease-out;
 }
 
 .modal-header{
-
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
-
     margin-bottom:18px;
-
     padding-bottom:12px;
-
     border-bottom:1px solid var(--border);
 }
 
 .modal-header h3{
-
     margin:0;
-
     font-size:18px;
-
     font-weight:600;
 }
 
 .modal-close{
-
     color:var(--muted);
-
     cursor:pointer;
-
     font-size:22px;
 }
 
 .modal-close:hover{
-
     color:var(--text);
 }
 
 .modal-row{
 
     display:flex;
-
     justify-content:space-between;
-
     padding:8px 0;
-
     border-bottom:1px solid rgba(255,255,255,.03);
-
     font-size:13px;
 }
 
 .modal-row:last-child{
-
     border:none;
 }
 
 .modal-row .key{
-
     color:var(--muted);
 }
 
 .modal-row .val{
-
     text-align:right;
-
     font-weight:600;
-
     font-family:
         ui-monospace,
         SFMono-Regular,
@@ -475,16 +360,12 @@ button:disabled{
 @keyframes modalSlide{
 
     from{
-
         opacity:0;
-
         transform:translateY(8px);
     }
 
     to{
-
         opacity:1;
-
         transform:translateY(0);
     }
 }
@@ -501,4 +382,46 @@ button:disabled{
 
 ::-webkit-scrollbar-track{
     background:var(--bg);
+}
+
+/* ========================================= */
+/* Infrastructure Footer (Muted) */
+/* ========================================= */
+
+.runner-info {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.runner-info h4 {
+    margin: 0 0 8px 0;
+    font-size: 11px;
+    color: #6e7681;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.runner-info p {
+    margin: 0 0 10px 0;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.runner-info ul {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--muted);
+}
+
+.runner-info li {
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.runner-info strong {
+    color: #8b949e; 
+    font-weight: 600;
 }
