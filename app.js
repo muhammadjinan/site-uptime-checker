@@ -229,3 +229,99 @@ function closeModalOnBackdrop(e) {
 }
 
 window.onload = fetchLatestTests;
+
+// Grab the UI elements
+const testBtn = document.getElementById('live-test-btn');
+const urlInput = document.getElementById('live-url-input');
+const pollingStatus = document.getElementById('polling-status');
+const statusText = document.getElementById('status-text');
+
+// Polling configuration
+let pollInterval;
+const MAX_POLL_ATTEMPTS = 25; // Stop checking after ~75 seconds to prevent endless loops
+
+testBtn.addEventListener('click', async () => {
+  const targetUrl = urlInput.value.trim();
+  
+  if (!targetUrl) {
+    alert("Please enter a valid URL.");
+    return;
+  }
+
+  // 1. Lock the UI and show the spinner
+  testBtn.disabled = true;
+  urlInput.disabled = true;
+  pollingStatus.classList.remove('hidden');
+  statusText.innerText = "Dispatching workflow to GitHub Actions...";
+
+  // Record the exact time we started the test (so we don't pull old data)
+  const testStartTime = new Date().toISOString();
+
+  try {
+    // 2. Call the Supabase Edge Function (Fire and Forget)
+    const { data, error } = await supabase.functions.invoke('trigger-github-action', {
+      body: { target_url: targetUrl }
+    });
+
+    if (error) throw error;
+
+    statusText.innerText = "Test running on Azure infrastructure. Waiting for results...";
+    
+    // 3. Start Polling the Database
+    startPolling(targetUrl, testStartTime);
+
+  } catch (err) {
+    console.error("Error triggering test:", err);
+    statusText.innerText = "Error: Could not start test. Check console.";
+    resetUI();
+  }
+});
+
+function startPolling(targetUrl, startTime) {
+  let attempts = 0;
+
+  pollInterval = setInterval(async () => {
+    attempts++;
+    
+    // Safety fallback: If it takes longer than 75 seconds, stop polling
+    if (attempts > MAX_POLL_ATTEMPTS) {
+      clearInterval(pollInterval);
+      statusText.innerText = "Test timed out or took too long. Please refresh the page later.";
+      resetUI();
+      return;
+    }
+
+    try {
+      // Query the database for results matching the URL that were created AFTER we clicked the button
+      const { data: newResults, error } = await supabase
+        .from('your_table_name') // NOTE: Replace with your actual table name!
+        .select('*')
+        .eq('url', targetUrl)
+        .gte('created_at', startTime);
+
+      if (error) throw error;
+
+      // If we found at least 3 rows (assuming 3 regions tested per URL)
+      if (newResults && newResults.length >= 3) {
+        clearInterval(pollInterval);
+        statusText.innerText = "Test complete! Updating dashboard...";
+        
+        // Call your existing function to refresh the dashboard grid
+        // e.g., fetchLatestResults(); 
+        
+        setTimeout(() => {
+          pollingStatus.classList.add('hidden');
+          resetUI();
+          urlInput.value = ''; // Clear the input
+        }, 2000);
+      }
+    } catch (err) {
+      console.error("Error polling database:", err);
+    }
+  }, 3000); // Poll every 3 seconds
+}
+
+function resetUI() {
+  testBtn.disabled = false;
+  urlInput.disabled = false;
+}
