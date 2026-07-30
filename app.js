@@ -17,6 +17,22 @@ const CCTLD_MAP = {
     "vn": "Vietnam", "tw": "Taiwan", "hk": "Hong Kong", "pk": "Pakistan", "ng": "Nigeria"
 };
 
+function normalizeUrl(input) {
+  if (!input) return "";
+
+  // Trim whitespace and force lowercase (fixes "GitHub.com" vs "github.com")
+  let url = input.trim().toLowerCase();
+
+  // If user explicitly typed http:// or https://, keep it!
+  // Otherwise, default to https://
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    url = "https://" + url;
+  }
+
+  // Remove trailing slashes for clean DB matching
+  return url.replace(/\/$/, "");
+}
+
 // Convert HTTP status code into technical label
 function formatHttpStatus(code) {
     if (code === 200) return "200 OK";
@@ -94,21 +110,22 @@ async function fetchLatestTests() {
 
 // Search tested URL
 async function searchTestedUrl() {
-    let urlInput = document.getElementById("url-input").value.trim();
+    let rawInput = document.getElementById("url-input").value;
+    let urlInput = normalizeUrl(rawInput); // Use our new cleaner
+
     const btn = document.getElementById("check-btn");
     const headline = document.getElementById("checking-headline");
 
-    if (!urlInput || urlInput === "https://" || urlInput === "http://") {
+    if (!urlInput || urlInput === "https://") {
         fetchLatestTests();
         return;
     }
 
-    urlInput = urlInput.replace(/\/$/, "");
     btn.disabled = true;
     btn.innerText = "Searching...";
     headline.innerText = "Querying repository records for: " + urlInput;
 
-    const dbQueryUrl = SUPABASE_URL + "/rest/v1/site_checks?url=eq." + encodeURIComponent(urlInput) + "&order=checked_at.desc&limit=9";
+    const dbQueryUrl = SUPABASE_URL + "/rest/v1/site_checks?url=ilike.*" + encodeURIComponent(urlInput) + "*&order=checked_at.desc&limit=9";
 
     try {
         const response = await fetch(dbQueryUrl, {
@@ -241,9 +258,10 @@ let pollInterval;
 const MAX_POLL_ATTEMPTS = 25; // Stop checking after ~75 seconds to prevent endless loops
 
 testBtn.addEventListener('click', async () => {
-  const targetUrl = urlInput.value.trim();
+  let rawUrl = urlInput.value;
+  const targetUrl = normalizeUrl(rawUrl); // Use our new cleaner
   
-  if (!targetUrl) {
+  if (!targetUrl || targetUrl === "https://") {
     alert("Please enter a valid URL.");
     return;
   }
