@@ -294,7 +294,7 @@ function startPolling(targetUrl, startTime) {
     try {
       // Query the database for results matching the URL that were created AFTER we clicked the button
       const { data: newResults, error } = await supabase
-        .from('your_table_name') // NOTE: Replace with your actual table name!
+        .from('site_checks') // Actual Supabase table name!
         .select('*')
         .eq('url', targetUrl)
         .gte('created_at', startTime);
