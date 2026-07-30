@@ -290,50 +290,43 @@ testBtn.addEventListener('click', async () => {
 });
 
 function startPolling(targetUrl, testStartTime) {
-  // Give a generous 30-second buffer for server time differences
   const bufferedStartTime = new Date(new Date(testStartTime).getTime() - 30000).toISOString();
   let attempts = 0;
-  const maxAttempts = 30; // 2 minutes total
+  const maxAttempts = 30; 
   const pollIntervalMs = 4000;
-
-  console.log("🔍 [Polling Started] Searching for URL:", targetUrl);
-  console.log("⏱️ [Polling Filter] Looking for records after:", bufferedStartTime);
 
   const intervalId = setInterval(async () => {
     attempts++;
     statusText.innerText = `Checking database for results (${attempts}/${maxAttempts})...`;
 
     try {
-      // Query the latest check using the same REST method as the rest of your app
       const pollUrl = SUPABASE_URL + "/rest/v1/site_checks?order=checked_at.desc&limit=1";
       
       const response = await fetch(pollUrl, {
           headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY }
       });
 
-      if (!response.ok) {
-        console.error("❌ [Polling Query Error]:", await response.text());
-        return;
-      }
+      if (!response.ok) return;
 
       const data = await response.json();
-
-      console.log(`📡 [Attempt ${attempts}] Latest DB record:`, data ? data[0] : "No records");
 
       if (data && data.length > 0) {
         const latestRecord = data[0];
         const recordTime = new Date(latestRecord.checked_at).getTime();
         const startTime = new Date(bufferedStartTime).getTime();
 
-        // Check if the latest record arrived after we started the test
         if (recordTime >= startTime) {
           console.log("🎉 New test result detected in database!", latestRecord);
           clearInterval(intervalId);
           statusText.innerText = "Test completed successfully!";
           
-          // Re-fetch the page data/grid
-          fetchLatestTests();
+          // 1. Refresh grid data
+          await fetchLatestTests();
 
+          // 2. Automatically open the telemetry modal for the new result (first card)
+          openModal(0);
+
+          // 3. Reset the top UI & hide the spinner status box
           resetUI();
           return;
         }
@@ -341,7 +334,6 @@ function startPolling(targetUrl, testStartTime) {
 
       if (attempts >= maxAttempts) {
         clearInterval(intervalId);
-        console.log("⏰ Polling timed out after 30 attempts.");
         statusText.innerText = "Test took longer than expected. Please refresh the page.";
         resetUI();
       }
@@ -354,4 +346,9 @@ function startPolling(targetUrl, testStartTime) {
 function resetUI() {
   testBtn.disabled = false;
   urlInput.disabled = false;
+  
+  // Hide the status text & spinner box after a brief 1.5s delay
+  setTimeout(() => {
+    pollingStatus.classList.add('hidden');
+  }, 1500);
 }
