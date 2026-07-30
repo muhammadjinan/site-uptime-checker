@@ -1,31 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Status Records Lookup</title>
-    <link rel="stylesheet" href="style.css">
-</head>
 <body>
-
     <div class="wrapper">
         <header>
-            <h1>Global Status Archive Search</h1>
-            <p>Look up any previously monitored site to view its latest regional edge metrics and scan timestamps</p>
+            <h1>Global Status Archive</h1>
+            <p>Viewing the latest regional edge metrics and scan timestamps</p>
         </header>
 
+        <!-- Secondary Search Action -->
         <div class="search-box">
-            <!-- Modified button onclick handler to link directly to our new search engine logic -->
-            <input type="text" id="url-input" placeholder="https://example.com" value="https://">
+            <input type="text" id="url-input" placeholder="Search a specific URL... (e.g., https://example.com)">
             <button id="check-btn" onclick="searchTestedUrl()">Search Database</button>
         </div>
 
-        <div id="status-display" class="status-container">
-            <h3 id="checking-headline" style="margin: 0; font-size: 16px; font-weight: bold; line-height: 1.5;">Querying Vault...</h3>
+        <!-- Primary Display for Recent or Searched URLs -->
+        <div id="status-display" class="status-container" style="display: block;">
+            <h3 id="checking-headline" style="margin: 0; font-size: 16px; font-weight: bold; line-height: 1.5;">Fetching latest 5 tests...</h3>
             <div class="grid" id="nodes-grid"></div>
         </div>
     </div>
 
     <script src="app.js"></script>
 </body>
-</html>
