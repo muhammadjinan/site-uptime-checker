@@ -258,15 +258,15 @@ testBtn.addEventListener('click', async () => {
 
   try {
     // 2. Direct fetch call to your deployed Supabase Edge Function
-    // NOTE: Make sure SUPABASE_ANON_KEY matches your existing key variable name in app.js
+    // NOTE: Make sure SUPABASE_KEY matches your existing key variable name in app.js
     const response = await fetch(
       'https://oqemerijdbximspphlgz.supabase.co/functions/v1/trigger-github-action',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'apikey': SUPABASE_ANON_KEY
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'apikey': SUPABASE_KEY
         },
         body: JSON.stringify({ target_url: targetUrl })
       }
