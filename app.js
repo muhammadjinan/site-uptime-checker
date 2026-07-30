@@ -9,11 +9,11 @@ async function fetchLatestTests() {
     const grid = document.getElementById("nodes-grid");
     
     display.style.display = "block";
-    headline.innerText = "Latest 5 Site Evaluations";
+    headline.innerText = "Latest 9 Site Evaluations";
     grid.innerHTML = "";
 
-    // Query Supabase: order by newest first, limit to 5
-    const dbQueryUrl = SUPABASE_URL + "/rest/v1/site_checks?order=checked_at.desc&limit=5";
+    // Query Supabase: order by newest first, limit to 9
+    const dbQueryUrl = SUPABASE_URL + "/rest/v1/site_checks?order=checked_at.desc&limit=9";
 
     try {
         const response = await fetch(dbQueryUrl, {
