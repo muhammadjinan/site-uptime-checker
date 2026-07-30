@@ -290,53 +290,69 @@ testBtn.addEventListener('click', async () => {
 });
 
 function startPolling(targetUrl, testStartTime) {
-  // 1. Subtract 10 seconds from testStartTime to prevent clock drift issues
-  const bufferedStartTime = new Date(new Date(testStartTime).getTime() - 10000).toISOString();
-  
+  // Give a generous 30-second buffer for server time differences
+  const bufferedStartTime = new Date(new Date(testStartTime).getTime() - 30000).toISOString();
   let attempts = 0;
-  const maxAttempts = 30; // 30 attempts * 4 seconds = 120 seconds (2 minutes max)
-  const pollIntervalMs = 4000; // Check every 4 seconds
+  const maxAttempts = 30; // 2 minutes total
+  const pollIntervalMs = 4000;
+
+  console.log("🔍 [Polling Started] Searching for URL:", targetUrl);
+  console.log("⏱️ [Polling Filter] Looking for records after:", bufferedStartTime);
 
   const intervalId = setInterval(async () => {
     attempts++;
-    
-    // Update status text so user sees live progress
-    statusText.innerText = `GitHub Action is running... checking database (${attempts}/${maxAttempts})`;
+    statusText.innerText = `Checking database for results (${attempts}/${maxAttempts})...`;
 
     try {
-      // Query Supabase for a check entry matching the target URL after buffered start time
+      // Query the latest check from the database without filtering by exact URL first
       const { data, error } = await supabase
-        .from('site_checks') // Replace with your exact table name if different
+        .from('site_checks')
         .select('*')
-        .eq('url', targetUrl) // Replace 'url' with your exact column name if different
-        .gte('checked_at', bufferedStartTime) // Replace 'checked_at' if your column is named differently
         .order('checked_at', { ascending: false })
         .limit(1);
 
       if (error) {
-        console.error("Polling error:", error);
+        console.error("❌ [Polling Query Error]:", error);
         return;
       }
 
-      // If a new row is found!
+      console.log(`📡 [Attempt ${attempts}] Latest DB record:`, data ? data[0] : "No records");
+
       if (data && data.length > 0) {
-        clearInterval(intervalId);
-        statusText.innerText = "Test completed successfully!";
-        
-        // Refresh your dashboard grid/table with the new data
-        if (typeof fetchLatestResults === 'function') {
-          fetchLatestResults();
+        const latestRecord = data[0];
+        const recordTime = new Date(latestRecord.checked_at).getTime();
+        const startTime = new Date(bufferedStartTime).getTime();
+
+        // Check if the latest record arrived after we started the test
+        if (recordTime >= startTime) {
+          console.log("🎉 New test result detected in database!", latestRecord);
+          clearInterval(intervalId);
+          statusText.innerText = "Test completed successfully!";
+          
+          // Re-fetch the page data/grid
+          if (typeof loadSiteChecks === 'function') {
+            loadSiteChecks();
+          } else if (typeof fetchLatestResults === 'function') {
+            fetchLatestResults();
+          } else {
+            console.warn("⚠️ Grid reload function not triggered. Check function name in app.js");
+            // Fallback: manually reload the data list if your app uses a specific render function
+            location.reload(); 
+          }
+
+          resetUI();
+          return;
         }
-        
-        resetUI();
-      } else if (attempts >= maxAttempts) {
-        // Stop polling after 2 minutes
+      }
+
+      if (attempts >= maxAttempts) {
         clearInterval(intervalId);
-        statusText.innerText = "Test took longer than expected. Please refresh the page in a moment.";
+        console.log("⏰ Polling timed out after 30 attempts.");
+        statusText.innerText = "Test took longer than expected. Please refresh the page.";
         resetUI();
       }
     } catch (err) {
-      console.error("Polling loop error:", err);
+      console.error("❌ [Polling Loop Error]:", err);
     }
   }, pollIntervalMs);
 }
