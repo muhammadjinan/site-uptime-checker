@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Reputation</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+    
+    <!-- Loads global styles from root -->
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<div class="app-layout">
+    
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h2>⚡ Global Status</h2>
+        </div>
+        
+        <div class="sidebar-menu">
+            <!-- Navigation Links -->
+            <a href="../index.html" class="nav-btn" style="text-decoration: none;">⚡ Live Diagnostics</a>
+            <a href="../archive/index.html" class="nav-btn" style="text-decoration: none;">🗄️ Status Archive</a>
+            <a href="index.html" class="nav-btn active" style="text-decoration: none;">🛡️ Site Reputation</a>
+        </div>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="main-content">
+        <header>
+            <h1>Site Reputation & Categorization</h1>
+            <p>Query multiple security vendors to determine domain trustworthiness and content category.</p>
+        </header>
+
+        <div class="test-panel">
+            <h3>🛡️ Analyze Domain</h3>
+            <div class="input-group">
+                <input type="text" id="rep-url-input" placeholder="example.com" required />
+                <button id="rep-test-btn" class="primary-btn">Scan Domain</button>
+            </div>
+            
+            <div id="scanning-status" class="hidden" style="margin-top: 12px;">
+                <div class="spinner"></div>
+                <span id="status-text">Querying security vendors...</span>
+            </div>
+        </div>
+
+        <!-- Reputation Results Grid -->
+        <div id="reputation-results" style="display: none; margin-top: 32px;">
+            <h3 style="margin-bottom: 16px; font-size: 16px;">Vendor Assessment Results</h3>
+            <div class="grid" id="vendor-grid">
+                <!-- Results injected here via JS -->
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Load shared tools first, then the reputation logic -->
+<script src="../utils.js"></script>
+<script src="reputation.js"></script>
+</body>
+</html>
