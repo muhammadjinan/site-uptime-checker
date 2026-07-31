@@ -87,7 +87,7 @@ async function fetchLatestTests() {
     headline.innerText = "Latest 9 Site Evaluations";
     grid.innerHTML = "";
 
-    const dbQueryUrl = SUPABASE_URL + "/rest/v1/site_checks?order=checked_at.desc&limit=9";
+    const dbQueryUrl = SUPABASE_URL + "/rest/v1/site_checks?order=checked_at.desc&limit=15";
 
     try {
         const response = await fetch(dbQueryUrl, {
@@ -125,7 +125,7 @@ async function searchTestedUrl() {
     btn.innerText = "Searching...";
     headline.innerText = "Querying repository records for: " + urlInput;
 
-    const dbQueryUrl = SUPABASE_URL + "/rest/v1/site_checks?url=ilike.*" + encodeURIComponent(urlInput) + "*&order=checked_at.desc&limit=9";
+    const dbQueryUrl = SUPABASE_URL + "/rest/v1/site_checks?url=ilike.*" + encodeURIComponent(urlInput) + "*&order=checked_at.desc&limit=15";
 
     try {
         const response = await fetch(dbQueryUrl, {
