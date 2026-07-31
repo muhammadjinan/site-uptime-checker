@@ -21,8 +21,8 @@
         
         <div class="sidebar-menu">
             <!-- Native anchor links for page routing -->
-            <a href="index.html" class="nav-btn active">⚡ Live Diagnostics</a>
-            <a href="archive/index.html" class="nav-btn">🗄️ Status Archive</a>
+            <a href="index.html" class="nav-btn active" style="text-decoration: none;">⚡ Live Diagnostics</a>
+            <a href="archive/index.html" class="nav-btn" style="text-decoration: none;">🗄️ Status Archive</a>
         </div>
     </aside>
 
@@ -50,7 +50,7 @@
         </div>
 
         <footer class="runner-info">
-            <h4>Runner Infrastructure Routing</h4>
+            <h4>RUNNER INFRASTRUCTURE ROUTING</h4>
             <p>Monitoring nodes operate via GitHub Actions on Microsoft Azure data centers...</p>
             <ul>
                 <li><strong>US_EAST_OR_WEST (Ubuntu):</strong> Azure East US 2 or West US 2.</li>
@@ -59,9 +59,10 @@
             </ul>
         </footer>
 
-        <div class="main-developer-credit">
-            <p>DEVELOPED BY</p>
-            <a href="https://github.com/muhammadjinan" target="_blank" rel="noopener" class="github-link">
+        <!-- Developer Credit Section -->
+        <div class="main-developer-credit" style="margin-top: 32px;">
+            <span style="font-size: 11px; text-transform: uppercase; color: #6e7681; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">DEVELOPED BY</span>
+            <a href="https://github.com/muhammadjinan" target="_blank" rel="noopener" class="github-link" style="display: flex; align-items: center; gap: 8px; color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 500;">
                 <!-- GitHub SVG Icon -->
                 <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
@@ -72,7 +73,20 @@
     </main>
 </div>
 
-<!-- Loads dedicated JS for this page -->
+<!-- Technical Details Modal Pop-up -->
+<div id="detail-modal" class="modal-backdrop" onclick="closeModalOnBackdrop(event)" style="display: none;">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 id="modal-title">Telemetry Inspection</h3>
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body" id="modal-content">
+            <!-- Dynamically populated by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Load shared tools first, then the diagnostics logic -->
 <script src="utils.js"></script>
 <script src="diagnostics.js"></script>
 </body>
