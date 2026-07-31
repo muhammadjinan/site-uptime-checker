@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Archive</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    
+    <!-- Loads global styles from root, and local styles from archive folder -->
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="archive.css">
+</head>
+<body>
+
+<div class="app-layout">
+    
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h2>⚡ Global Status</h2>
+        </div>
+        
+        <div class="sidebar-menu">
+            <!-- Navigate back one directory for Home -->
+            <a href="../index.html" class="nav-btn">⚡ Live Diagnostics</a>
+            <a href="index.html" class="nav-btn active">🗄️ Status Archive</a>
+        </div>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="main-content">
+        <header>
+            <h1>Status Archive</h1>
+            <p>Search historical database telemetry and view the latest global evaluations.</p>
+        </header>
+
+        <div class="search-box">
+            <input type="text" id="url-input" placeholder="Search database (defaults to https://)..." />
+            <button id="check-btn" onclick="searchTestedUrl()">Search Database</button>
+        </div>
+
+        <div id="status-display" class="status-container" style="display: block; margin-top: 32px;">
+            <h3 id="checking-headline" style="margin: 0 0 16px 0; font-size: 16px; font-weight: bold;">
+                Fetching latest 15 site evaluations...
+            </h3>
+            <div class="grid" id="nodes-grid"></div>
+        </div>
+    </main>
+</div>
+
+<!-- Telemetry Modal (Moved here because it only belongs in the archive) -->
+<div id="detail-modal" class="modal-backdrop" onclick="closeModalOnBackdrop(event)" style="display: none;">
+    <div class="modal-card">
+        <!-- Modal content omitted for brevity -->
+    </div>
+</div>
+
+<!-- Loads dedicated JS for this page -->
+<script src="archive.js"></script>
+</body>
+</html>
