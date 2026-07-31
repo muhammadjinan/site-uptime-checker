@@ -1,3 +1,6 @@
+const SUPABASE_URL = "https://oqemerijdbximspphlgz.supabase.co"; 
+const SUPABASE_KEY = "sb_publishable_iAMHiklN8FM6gisu_EHGRA_XqbkYTSa"; 
+
 // Fetch 9 latest tests
 async function fetchLatestTests() {
     const display = document.getElementById("status-display");
