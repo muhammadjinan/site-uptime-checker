@@ -27,23 +27,105 @@
     box-sizing:border-box;
 }
 
-body{
-    margin:0;
-    padding:28px;
-    background:var(--bg);
-    color:var(--text);
-    font-family:
-        Inter,
-        "Segoe UI",
-        Roboto,
-        sans-serif;
-    line-height:1.45;
-    -webkit-font-smoothing:antialiased;
+body {
+    margin: 0;
+    padding: 0; /* Removed padding to let app-layout handle spacing */
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
 }
 
-.wrapper{
-    max-width:1000px;
-    margin:auto;
+/* ========================================= */
+/* App Layout (Sidebar + Main) */
+/* ========================================= */
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 300px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    flex-shrink: 0;
+}
+
+.sidebar-brand h2 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--text);
+}
+
+.sidebar-section h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin: 0 0 12px 0;
+}
+
+/* Navigation Button */
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-btn:hover {
+    background: var(--surface-hover);
+}
+
+.nav-btn.active {
+    background: rgba(88, 166, 255, 0.1);
+    border: 1px solid var(--blue);
+    color: var(--blue);
+}
+
+/* Vertical Search Box in Sidebar */
+.search-box.sidebar-search {
+    flex-direction: column;
+    padding: 0;
+    background: transparent;
+    border: none;
+    gap: 8px;
+}
+
+.search-box.sidebar-search input {
+    width: 100%;
+}
+
+.search-box.sidebar-search button {
+    width: 100%;
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    padding: 32px 48px;
+    max-width: 1100px;
+    overflow-y: auto;
 }
 
 /* ========================================= */
