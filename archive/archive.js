@@ -1,14 +1,14 @@
-const SUPABASE_URL = "https://oqemerijdbximspphlgz.supabase.co"; 
-const SUPABASE_KEY = "sb_publishable_iAMHiklN8FM6gisu_EHGRA_XqbkYTSa"; 
+// Global cache for modal inspection
+let currentFetchedRows = [];
 
-// Fetch 9 latest tests
+// Fetch latest tests
 async function fetchLatestTests() {
     const display = document.getElementById("status-display");
     const headline = document.getElementById("checking-headline");
     const grid = document.getElementById("nodes-grid");
     
     display.style.display = "block";
-    headline.innerText = "Latest 5 Site Evaluations Across 3 Regions";
+    headline.innerText = "Fetching latest 15 site evaluations...";
     grid.innerHTML = "";
 
     const dbQueryUrl = SUPABASE_URL + "/rest/v1/site_checks?order=checked_at.desc&limit=15";
@@ -20,7 +20,7 @@ async function fetchLatestTests() {
         currentFetchedRows = await response.json();
 
         if (!currentFetchedRows || currentFetchedRows.length === 0) {
-            headline.innerText = "🔍 No historical data found in database.";
+            headline.innerText = "⚠️ No historical data found in database.";
             return;
         }
 
@@ -28,14 +28,14 @@ async function fetchLatestTests() {
 
     } catch (err) {
         console.error("Database lookup error: ", err);
-        headline.innerText = "🚨 Error communicating with backend database.";
+        headline.innerText = "❌ Error communicating with backend database.";
     }
 }
 
 // Search tested URL
 async function searchTestedUrl() {
     let rawInput = document.getElementById("url-input").value;
-    let urlInput = normalizeUrl(rawInput); // Use our new cleaner
+    let urlInput = normalizeUrl(rawInput); 
 
     const btn = document.getElementById("check-btn");
     const headline = document.getElementById("checking-headline");
@@ -58,18 +58,18 @@ async function searchTestedUrl() {
         currentFetchedRows = await response.json();
 
         if (!currentFetchedRows || currentFetchedRows.length === 0) {
-            headline.innerText = "🔍 No historical records found for: " + urlInput;
+            headline.innerText = "⚠️ No historical records found for: " + urlInput;
             btn.disabled = false;
             btn.innerText = "Search Database";
             return;
         }
 
-        headline.innerHTML = `🎯 Showing telemetry results for <strong>${urlInput}</strong>`;
+            headline.innerHTML = `✅ Showing telemetry results for <strong>${urlInput}</strong>`;
         renderCards(currentFetchedRows);
 
     } catch (err) {
         console.error("Search error: ", err);
-        headline.innerText = "🚨 Error communicating with database.";
+        headline.innerText = "❌ Error communicating with database.";
     }
 
     btn.disabled = false;
@@ -130,3 +130,33 @@ function renderCards(rows) {
     });
 }
 
+// Modal Pop-up Handlers
+function openModal(index) {
+    const row = currentFetchedRows[index];
+    if (!row) return;
+
+    const modal = document.getElementById("detail-modal");
+    const content = document.getElementById("modal-content");
+    const geoInfo = evaluateGeoRestriction(row.url, row.status_code, row.remarks);
+    
+    const scanTime = new Date(row.checked_at).toLocaleString();
+
+    content.innerHTML = `
+        <div class="modal-row"><span class="key">Target URL:</span><span class="val" style="color:#60a5fa; word-break:break-all;">${row.url}</span></div>
+        <div class="modal-row"><span class="key">HTTP Status:</span><span class="val">${formatHttpStatus(row.status_code)}</span></div>
+        <div class="modal-row"><span class="key">Response Time:</span><span class="val">${row.latency_ms ? row.latency_ms + ' ms' : 'N/A'}</span></div>
+        <div class="modal-row"><span class="key">Runner Region:</span><span class="val">${row.region}</span></div>
+        <div class="modal-row"><span class="key">Scan Timestamp:</span><span class="val">${scanTime}</span></div>
+        <div class="modal-row"><span class="key">Backend Remarks:</span><span class="val">${row.remarks || 'None'}</span></div>
+        ${geoInfo.isGeoRestricted ? `
+            <div class="geo-badge" style="margin-top:16px; font-size:12px; padding:10px;">
+                <strong>Geo-Restriction Assessment:</strong><br>
+                Target uses country top-level domain <code>${geoInfo.tld}</code> (${geoInfo.country}). Non-200 HTTP response from runner region <code>${row.region}</code> indicates access restriction or localized firewall dropping foreign requests.
+            </div>
+        ` : ''}
+    `;
+
+    modal.style.display = "flex";
+}
+
+window.onload = fetchLatestTests;
