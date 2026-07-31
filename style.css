@@ -598,3 +598,38 @@ button:disabled{
 @keyframes spin { 
   to { transform: rotate(360deg); } 
 }
+
+/* ========================================= */
+/* Mobile Responsive Layout */
+/* ========================================= */
+
+@media (max-width: 768px) {
+    /* Stack the layout vertically */
+    .app-layout {
+        flex-direction: column;
+    }
+
+    /* Turn the sidebar into a top section */
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 24px 20px;
+        gap: 20px;
+    }
+
+    /* Hide the "View 15 Evaluations" navigation button on mobile to save space */
+    .sidebar-menu {
+        display: none; 
+    }
+
+    /* Adjust main content padding for smaller screens */
+    .main-content {
+        padding: 24px 20px;
+    }
+
+    /* Make the grid 1-column on mobile for readability */
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
