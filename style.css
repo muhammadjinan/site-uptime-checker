@@ -129,6 +129,39 @@ body {
 }
 
 /* ========================================= */
+/* Sidebar Footer / Developer Credit */
+/* ========================================= */
+
+.sidebar-footer {
+    margin-top: auto; /* Pushes the footer to the bottom of the sidebar */
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.sidebar-footer p {
+    font-size: 11px;
+    color: #6e7681;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 12px 0;
+}
+
+.github-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: color 0.15s ease;
+}
+
+.github-link:hover {
+    color: var(--text); /* Lights up white on hover */
+}
+
+/* ========================================= */
 
 header{
     margin-bottom:28px;
