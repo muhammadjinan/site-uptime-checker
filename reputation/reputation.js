@@ -23,45 +23,37 @@ repBtn.addEventListener('click', async () => {
     statusText.innerText = `Querying threat intelligence for ${targetUrl}...`;
 
     try {
-        // ==========================================
-        // TODO: Replace this simulated delay with an 
-        // actual fetch() call to your backend/Supabase API
-        // ==========================================
-        await new Promise(resolve => setTimeout(resolve, 2000)); 
-        
-        // Mock data structure that your future API should return
-        const mockResults = [
-            {
-                source: "Skyhigh Security (TrustedSource)",
-                category: "Technology/Internet",
-                reputation: "Minimal Risk",
-                isSafe: true
+    const response = await fetch(
+        'https://oqemerijdbximspphlgz.supabase.co/functions/v1/check-reputation',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${SUPABASE_KEY}`, // Uses the key from your utils.js
+                'apikey': SUPABASE_KEY
             },
-            {
-                source: "VirusTotal",
-                category: "Uncategorized",
-                reputation: "0/94 Security Vendors Flagged",
-                isSafe: true
-            },
-            {
-                source: "Cloudflare Radar",
-                category: "Technology",
-                reputation: "Top 10,000 Global Domain",
-                isSafe: true
-            }
-        ];
+            body: JSON.stringify({ target_url: targetUrl })
+        }
+    );
 
-        renderReputationCards(mockResults, targetUrl);
-
-    } catch (err) {
-        console.error("Error fetching reputation:", err);
-        statusText.innerText = `Error: ${err.message}`;
-    } finally {
-        repBtn.disabled = false;
-        repInput.disabled = false;
-        setTimeout(() => scanStatus.classList.add('hidden'), 1000);
+    if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || 'Failed to analyze domain');
     }
-});
+
+    const data = await response.json();
+    
+    // Pass the live results array to your UI renderer
+    renderReputationCards(data.results, targetUrl);
+
+} catch (err) {
+    console.error("Error fetching reputation:", err);
+    statusText.innerText = `Error: ${err.message}`;
+} finally {
+    repBtn.disabled = false;
+    repInput.disabled = false;
+    setTimeout(() => scanStatus.classList.add('hidden'), 1000);
+}
 
 function renderReputationCards(results, targetUrl) {
     vendorGrid.innerHTML = "";
