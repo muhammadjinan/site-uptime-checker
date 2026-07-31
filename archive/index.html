@@ -6,7 +6,7 @@
     <title>Status Archive</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
     
-    <!-- Loads global styles from root, and local styles from archive folder -->
+    <!-- Loads global styles from root -->
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -21,8 +21,8 @@
         
         <div class="sidebar-menu">
             <!-- Navigate back one directory for Home -->
-            <a href="../index.html" class="nav-btn">⚡ Live Diagnostics</a>
-            <a href="index.html" class="nav-btn active">🗄️ Status Archive</a>
+            <a href="../index.html" class="nav-btn" style="text-decoration: none;">⚡ Live Diagnostics</a>
+            <a href="index.html" class="nav-btn active" style="text-decoration: none;">🗄️ Status Archive</a>
         </div>
     </aside>
 
@@ -47,13 +47,6 @@
     </main>
 </div>
 
-<!-- Telemetry Modal (Moved here because it only belongs in the archive) -->
-<div id="detail-modal" class="modal-backdrop" onclick="closeModalOnBackdrop(event)" style="display: none;">
-    <div class="modal-card">
-        <!-- Modal content omitted for brevity -->
-    </div>
-</div>
-
 <!-- Technical Details Modal Pop-up -->
 <div id="detail-modal" class="modal-backdrop" onclick="closeModalOnBackdrop(event)" style="display: none;">
     <div class="modal-card">
@@ -61,14 +54,13 @@
             <h3 id="modal-title">Telemetry Inspection</h3>
             <span class="modal-close" onclick="closeModal()">&times;</span>
         </div>
-        <!-- This is the missing div that JavaScript is looking for! -->
         <div class="modal-body" id="modal-content">
             <!-- Dynamically populated by JS -->
         </div>
     </div>
 </div>
-    
-<!-- Loads dedicated JS for this page -->
+
+<!-- Load shared tools first, then the archive logic -->
 <script src="../utils.js"></script>
 <script src="archive.js"></script>
 </body>
