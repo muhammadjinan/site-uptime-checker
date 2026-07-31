@@ -54,6 +54,20 @@
     </div>
 </div>
 
+<!-- Technical Details Modal Pop-up -->
+<div id="detail-modal" class="modal-backdrop" onclick="closeModalOnBackdrop(event)" style="display: none;">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 id="modal-title">Telemetry Inspection</h3>
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+        </div>
+        <!-- This is the missing div that JavaScript is looking for! -->
+        <div class="modal-body" id="modal-content">
+            <!-- Dynamically populated by JS -->
+        </div>
+    </div>
+</div>
+    
 <!-- Loads dedicated JS for this page -->
 <script src="../utils.js"></script>
 <script src="archive.js"></script>
