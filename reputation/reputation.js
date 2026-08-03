@@ -169,3 +169,27 @@ function renderReputationCards(results, targetUrl) {
         </div>
     `;
 }
+
+async function fetchRedirectChain(targetUrl) {
+    const supabaseUrl = 'https://oqemerijdbximspphlgz.supabase.co/functions/v1/trace-redirects';
+    
+    try {
+        const response = await fetch(supabaseUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Uncomment and add if your edge function requires your anon key:
+                // 'Authorization': 'Bearer YOUR_ANON_KEY'
+            },
+            body: JSON.stringify({ url: targetUrl })
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch redirect chain');
+        
+        const data = await response.json();
+        return data.chain;
+    } catch (error) {
+        console.error("Trace error:", error);
+        return null;
+    }
+}
