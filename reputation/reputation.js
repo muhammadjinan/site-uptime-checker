@@ -8,6 +8,14 @@ const statusText = document.getElementById('status-text');
 const resultsContainer = document.getElementById('reputation-results');
 const vendorGrid = document.getElementById('vendor-grid');
 
+// Allow "Enter" key to trigger the scan
+repInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Prevents page reload if wrapped in a form tag
+        repBtn.click(); // Programmatically click the button
+    }
+});
+
 // 2. Prove the button was found in the HTML
 if (!repBtn) {
     console.error("❌ ERROR: Could not find the 'Scan Domain' button in the HTML.");
