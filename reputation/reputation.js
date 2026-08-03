@@ -1,7 +1,7 @@
 // 1. Helper function to call your Edge Function for redirect tracing
 async function fetchRedirectChain(targetUrl) {
     // Replace with your actual Supabase URL
-    const supabaseUrl = 'https://oqemerijdbximspphlgz.supabase.co/functions/v1/trace-redirects';
+    const supabaseUrl = '${SUPABASE_URL}/functions/v1/trace-redirects';
     
     try {
         const response = await fetch(supabaseUrl, {
