@@ -79,48 +79,93 @@ repBtn.addEventListener('click', async () => {
     }
 });
 
+function openReputationModal() {
+    const data = window.currentReputationData;
+    if (!data) return;
+
+    const modal = document.getElementById("detail-modal");
+    const content = document.getElementById("modal-content");
+
+    let vtDetails = data.vtData ? `
+        <div style="margin-bottom: 16px; border-left: 3px solid #3b82f6; padding-left: 10px; background: rgba(255,255,255,0.05); border-radius: 0 4px 4px 0; padding: 12px;">
+            <h4 style="margin: 0 0 8px 0; color: #94a3b8; font-size: 13px;">VIRUSTOTAL THREAT INTELLIGENCE</h4>
+            <div class="modal-row"><span class="key">Reputation:</span><span class="val">${data.vtData.reputation}</span></div>
+            <div class="modal-row"><span class="key">Safe to Browse:</span><span class="val ${data.vtData.isSafe ? 'text-up' : 'text-down'}">${data.vtData.isSafe ? 'Yes' : 'No'}</span></div>
+        </div>
+    ` : '';
+
+    let cfDetails = data.cfData ? `
+        <div style="margin-bottom: 16px; border-left: 3px solid #f59e0b; padding-left: 10px; background: rgba(255,255,255,0.05); border-radius: 0 4px 4px 0; padding: 12px;">
+            <h4 style="margin: 0 0 8px 0; color: #94a3b8; font-size: 13px;">CLOUDFLARE RADAR</h4>
+            <div class="modal-row"><span class="key">Category:</span><span class="val">${data.cfData.category}</span></div>
+            ${data.cfData.isFallback ? `<div class="modal-row"><span class="key">Note:</span><span class="val" style="color: #f59e0b; font-size: 12px;">Category inherited from root domain (${data.cfData.fallbackDomain})</span></div>` : ''}
+        </div>
+    ` : '';
+
+    content.innerHTML = `
+        <div style="margin-bottom: 16px;">
+            <span style="color:#94a3b8; font-size:12px;">Unified assessment for:</span><br>
+            <strong style="color:#60a5fa; font-size:16px; word-break:break-all;">${data.resolvedDomain}</strong>
+            ${data.wasRedirected ? `<div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">(Redirected from ${data.originalUrlClean})</div>` : ''}
+        </div>
+        ${vtDetails}
+        ${cfDetails}
+    `;
+    
+    modal.style.display = "flex";
+}
+
 function renderReputationCards(results, targetUrl) {
     vendorGrid.innerHTML = "";
     resultsContainer.style.display = "block";
 
     const originalUrlClean = targetUrl.replace(/^https?:\/\//, '');
+    
+    const vtData = results.find(r => r.source === "VirusTotal Threat Intelligence");
+    const cfData = results.find(r => r.source === "Cloudflare Radar");
 
-    results.forEach(item => {
-        const cardClass = item.isSafe ? "card-success" : "card-danger";
-        const dotClass = item.isSafe ? "dot-up" : "dot-down";
-        const textColor = item.isSafe ? "text-up" : "text-down";
+    const isSafe = vtData ? vtData.isSafe : true;
+    const cardClass = isSafe ? "card-success" : "card-danger";
+    const dotClass = isSafe ? "dot-up" : "dot-down";
 
-        // Fallback warning logic
-        const fallbackBadge = item.isFallback 
-            ? `(Fell back to ${item.fallbackDomain})`
-            : '';
+    const resolvedDomain = (vtData || cfData)?.resolvedDomain || originalUrlClean;
+    const wasRedirected = (vtData || cfData)?.wasRedirected || false;
 
-        // Redirect visualization logic
-        const targetDisplay = item.wasRedirected
-            ? `${item.resolvedDomain} (Redirected from ${originalUrlClean})`
-            : originalUrlClean;
+    const vtBadge = `<span style="font-size: 0.65rem; background: #334155; padding: 2px 6px; border-radius: 4px; margin-left: 6px; color: #cbd5e1;">VirusTotal</span>`;
+    const cfBadge = `<span style="font-size: 0.65rem; background: #334155; padding: 2px 6px; border-radius: 4px; margin-left: 6px; color: #cbd5e1;">Cloudflare</span>`;
 
-        vendorGrid.innerHTML += `
-            <div class="card ${cardClass}" style="cursor: default;">
-                <div>
-                    <div class="card-header">
-                        <span class="card-title">${item.source}</span>
-                        <span class="dot ${dotClass}"></span>
-                    </div>
-                    <div class="metric">
-                        <span class="label">Target:</span>
-                        <span class="value" style="color: #60a5fa;">${targetDisplay.replace(/^https?:\/\//, '')}</span>
-                    </div>
-                    <div class="metric">
-                        <span class="label">Category:</span>
-                        <span class="value">${item.category}${fallbackBadge}</span>
-                    </div>
-                    <div class="metric">
-                        <span class="label">Assessment:</span>
-                        <span class="value ${textColor}" style="font-weight: bold;">${item.reputation}</span>
-                    </div>
+    const categoryVal = cfData ? `${cfData.category} ${cfBadge}` : 'Unknown';
+    const assessmentVal = vtData 
+        ? `<span class="${vtData.isSafe ? 'text-up' : 'text-down'}" style="font-weight: bold;">${vtData.reputation}</span> ${vtBadge}` 
+        : 'Unknown';
+
+    window.currentReputationData = { originalUrlClean, resolvedDomain, wasRedirected, vtData, cfData };
+
+    vendorGrid.innerHTML = `
+        <div class="card ${cardClass}" style="width: 100%; max-width: 800px;">
+            <div>
+                <div class="card-header">
+                    <span class="card-title">Unified Security & Category Assessment</span>
+                    <span class="dot ${dotClass}"></span>
+                </div>
+                <div class="metric">
+                    <span class="label">Submitted:</span>
+                    <span class="value">${originalUrlClean}</span>
+                </div>
+                <div class="metric">
+                    <span class="label">Target:</span>
+                    <span class="value" style="color: #60a5fa;">${resolvedDomain}${wasRedirected ? ' <span style="font-size: 0.75rem; color: #9ca3af;">(Redirected)</span>' : ''}</span>
+                </div>
+                <div class="metric">
+                    <span class="label">Category:</span>
+                    <span class="value">${categoryVal}</span>
+                </div>
+                <div class="metric">
+                    <span class="label">Assessment:</span>
+                    <span class="value">${assessmentVal}</span>
                 </div>
             </div>
-        `;
-    });
+            <button class="inspect-btn" onclick="openReputationModal()" style="margin-top: 16px;">View More &rarr;</button>
+        </div>
+    `;
 }
