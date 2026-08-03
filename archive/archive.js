@@ -1,3 +1,11 @@
+// Allow "Enter" key to trigger the database search
+document.getElementById("url-input").addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        document.getElementById("check-btn").click();
+    }
+});
+
 // Global cache for modal inspection
 let currentFetchedRows = [];
 
