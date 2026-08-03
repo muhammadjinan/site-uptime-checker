@@ -80,6 +80,11 @@ function renderReputationCards(results, targetUrl) {
         const dotClass = item.isSafe ? "dot-up" : "dot-down";
         const textColor = item.isSafe ? "text-up" : "text-down";
 
+        // Build fallback warning tag if applicable
+        const fallbackBadge = item.isFallback 
+            ? `<span style="font-size: 0.75rem; color: #f59e0b; font-weight: normal; margin-left: 6px;">(Fell back to ${item.fallbackDomain})</span>`
+            : '';
+
         vendorGrid.innerHTML += `
             <div class="card ${cardClass}" style="cursor: default;">
                 <div>
@@ -93,7 +98,7 @@ function renderReputationCards(results, targetUrl) {
                     </div>
                     <div class="metric">
                         <span class="label">Category:</span>
-                        <span class="value">${item.category}</span>
+                        <span class="value">${item.category}${fallbackBadge}</span>
                     </div>
                     <div class="metric">
                         <span class="label">Assessment:</span>
