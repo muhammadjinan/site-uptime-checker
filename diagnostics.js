@@ -5,10 +5,10 @@ const pollingStatus = document.getElementById('polling-status');
 const statusText = document.getElementById('status-text');
 
 // Allow "Enter" key to trigger the scan
-testInput.addEventListener('keypress', (event) => {
+urlInput.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
         event.preventDefault(); // Prevents page reload if wrapped in a form tag
-        repBtn.click(); // Programmatically click the button
+        testBtn.click(); // Programmatically click the button
     }
 });
 
