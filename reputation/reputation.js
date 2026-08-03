@@ -75,15 +75,22 @@ function renderReputationCards(results, targetUrl) {
     vendorGrid.innerHTML = "";
     resultsContainer.style.display = "block";
 
+    const originalUrlClean = targetUrl.replace(/^https?:\/\//, '');
+
     results.forEach(item => {
         const cardClass = item.isSafe ? "card-success" : "card-danger";
         const dotClass = item.isSafe ? "dot-up" : "dot-down";
         const textColor = item.isSafe ? "text-up" : "text-down";
 
-        // Build fallback warning tag if applicable
+        // Fallback warning logic
         const fallbackBadge = item.isFallback 
-            ? `<span style="font-size: 0.75rem; color: #f59e0b; font-weight: normal; margin-left: 6px;">(Fell back to ${item.fallbackDomain})</span>`
+            ? `(Fell back to ${item.fallbackDomain})`
             : '';
+
+        // Redirect visualization logic
+        const targetDisplay = item.wasRedirected
+            ? `${item.resolvedDomain} (Redirected from ${originalUrlClean})`
+            : originalUrlClean;
 
         vendorGrid.innerHTML += `
             <div class="card ${cardClass}" style="cursor: default;">
@@ -94,7 +101,7 @@ function renderReputationCards(results, targetUrl) {
                     </div>
                     <div class="metric">
                         <span class="label">Target:</span>
-                        <span class="value" style="color: #60a5fa;">${targetUrl.replace(/^https?:\/\//, '')}</span>
+                        <span class="value" style="color: #60a5fa;">${targetDisplay.replace(/^https?:\/\//, '')}</span>
                     </div>
                     <div class="metric">
                         <span class="label">Category:</span>
