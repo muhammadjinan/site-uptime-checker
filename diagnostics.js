@@ -4,6 +4,14 @@ const urlInput = document.getElementById('live-url-input');
 const pollingStatus = document.getElementById('polling-status');
 const statusText = document.getElementById('status-text');
 
+// Allow "Enter" key to trigger the scan
+repInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Prevents page reload if wrapped in a form tag
+        repBtn.click(); // Programmatically click the button
+    }
+});
+
 // Polling configuration
 let pollInterval;
 const MAX_POLL_ATTEMPTS = 25; 
