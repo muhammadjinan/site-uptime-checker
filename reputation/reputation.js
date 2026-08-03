@@ -1,10 +1,33 @@
-// 1. Helper function to call your Edge Function for redirect tracing
+// ==========================================
+// 1. API HELPER FUNCTIONS
+// ==========================================
+
+// NOTE: If your existing fetchVendorAssessments function looks different, 
+// replace this block with your original function that fetches VirusTotal and Cloudflare.
+async function fetchVendorAssessments(targetUrl) {
+    // Replace with your actual edge function endpoint for vendor scans if necessary
+    const endpoint = `${SUPABASE_URL}/functions/v1/scan-domain`; 
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: targetUrl })
+        });
+        if (!response.ok) return [];
+        const data = await response.json();
+        return data.results || [];
+    } catch (error) {
+        console.error("Error fetching vendor assessments:", error);
+        return [];
+    }
+}
+
+// Fetch HTTP Redirect Chain using the global SUPABASE_URL from utils.js
 async function fetchRedirectChain(targetUrl) {
-    // Replace with your actual Supabase URL
-    const supabaseUrl = '${SUPABASE_URL}/functions/v1/trace-redirects';
+    const endpoint = `${SUPABASE_URL}/functions/v1/trace-redirects`;
     
     try {
-        const response = await fetch(supabaseUrl, {
+        const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ url: targetUrl })
@@ -19,7 +42,10 @@ async function fetchRedirectChain(targetUrl) {
     }
 }
 
-// 2. Updated Main Scan Function (Replace your existing scan trigger function)
+// ==========================================
+// 2. MAIN SCAN LOGIC
+// ==========================================
+
 async function scanDomain() {
     const inputElement = document.getElementById("domain-input");
     const targetUrl = inputElement.value.trim();
@@ -28,13 +54,14 @@ async function scanDomain() {
     // Show loading state
     const resultsContainer = document.getElementById("results-container");
     const loadingIndicator = document.getElementById("loading-indicator");
+    
     if (resultsContainer) resultsContainer.style.display = "none";
     if (loadingIndicator) loadingIndicator.style.display = "block";
 
     try {
-        // Run vendor assessment API call and HTTP redirect trace concurrently in parallel
+        // Run vendor assessment API call and HTTP redirect trace concurrently
         const [vendorResults, redirectChain] = await Promise.all([
-            fetchVendorAssessments(targetUrl), // Your existing function that calls VT & Cloudflare
+            fetchVendorAssessments(targetUrl), 
             fetchRedirectChain(targetUrl)
         ]);
 
@@ -48,11 +75,16 @@ async function scanDomain() {
     }
 }
 
-// 3. Updated Card Renderer
+// ==========================================
+// 3. UI RENDERING
+// ==========================================
+
 function renderReputationCards(results, targetUrl, redirectChain = []) {
     const vendorGrid = document.getElementById("vendor-grid");
     const resultsContainer = document.getElementById("results-container");
     
+    if (!vendorGrid || !resultsContainer) return;
+
     vendorGrid.innerHTML = "";
     resultsContainer.style.display = "block";
 
@@ -121,20 +153,20 @@ function renderReputationCards(results, targetUrl, redirectChain = []) {
     `;
 }
 
-// 4. Modal Handler displaying Threat Details + Redirect Chain Timeline
 function openReputationModal() {
     const data = window.currentReputationData;
     if (!data) return;
 
     const modal = document.getElementById("detail-modal");
     const content = document.getElementById("modal-content");
+    if (!modal || !content) return;
 
     // VirusTotal Section
     let vtDetails = data.vtData ? `
         <div style="margin-bottom: 16px; border-left: 3px solid #3b82f6; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 0 4px 4px 0;">
             <h4 style="margin: 0 0 8px 0; color: #94a3b8; font-size: 12px; letter-spacing: 0.5px;">VIRUSTOTAL THREAT INTELLIGENCE</h4>
-            <div class="modal-row"><span class="key">Reputation:</span><span class="val">${data.vtData.reputation}</span></div>
-            <div class="modal-row"><span class="key">Safe to Browse:</span><span class="val ${data.vtData.isSafe ? 'text-up' : 'text-down'}">${data.vtData.isSafe ? 'Yes' : 'No'}</span></div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><span style="color:#94a3b8; font-size: 14px;">Reputation:</span><span style="color:#e2e8f0; font-size: 14px;">${data.vtData.reputation}</span></div>
+            <div style="display: flex; justify-content: space-between;"><span style="color:#94a3b8; font-size: 14px;">Safe to Browse:</span><span style="color: ${data.vtData.isSafe ? '#10b981' : '#ef4444'}; font-weight: bold; font-size: 14px;">${data.vtData.isSafe ? 'Yes' : 'No'}</span></div>
         </div>
     ` : '';
 
@@ -142,7 +174,7 @@ function openReputationModal() {
     let cfDetails = data.cfData ? `
         <div style="margin-bottom: 16px; border-left: 3px solid #f59e0b; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 0 4px 4px 0;">
             <h4 style="margin: 0 0 8px 0; color: #94a3b8; font-size: 12px; letter-spacing: 0.5px;">CLOUDFLARE RADAR</h4>
-            <div class="modal-row"><span class="key">Category:</span><span class="val">${data.cfData.category}</span></div>
+            <div style="display: flex; justify-content: space-between;"><span style="color:#94a3b8; font-size: 14px;">Category:</span><span style="color:#e2e8f0; font-size: 14px;">${data.cfData.category}</span></div>
         </div>
     ` : '';
 
@@ -179,3 +211,45 @@ function openReputationModal() {
     
     modal.style.display = "flex";
 }
+
+// Helper to close modal if you have a close button
+function closeReputationModal() {
+    const modal = document.getElementById("detail-modal");
+    if (modal) modal.style.display = "none";
+}
+
+// ==========================================
+// 4. EVENT LISTENERS
+// ==========================================
+
+// Ensure the DOM is fully loaded before attaching listeners
+document.addEventListener("DOMContentLoaded", () => {
+    const scanBtn = document.getElementById("scan-btn"); // Verify this ID matches your HTML button
+    const domainInput = document.getElementById("domain-input");
+    const closeModalBtn = document.querySelector(".close-modal"); 
+
+    if (scanBtn) {
+        scanBtn.addEventListener("click", scanDomain);
+    }
+
+    if (domainInput) {
+        domainInput.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault(); 
+                scanDomain();
+            }
+        });
+    }
+
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener("click", closeReputationModal);
+    }
+
+    // Optional: Close modal when clicking outside of it
+    window.addEventListener("click", (e) => {
+        const modal = document.getElementById("detail-modal");
+        if (e.target === modal) {
+            closeReputationModal();
+        }
+    });
+});
