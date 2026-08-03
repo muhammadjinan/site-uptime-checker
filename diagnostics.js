@@ -5,7 +5,7 @@ const pollingStatus = document.getElementById('polling-status');
 const statusText = document.getElementById('status-text');
 
 // Allow "Enter" key to trigger the scan
-repInput.addEventListener('keypress', (event) => {
+testInput.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
         event.preventDefault(); // Prevents page reload if wrapped in a form tag
         repBtn.click(); // Programmatically click the button
