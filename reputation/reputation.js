@@ -193,3 +193,78 @@ async function fetchRedirectChain(targetUrl) {
         return null;
     }
 }
+
+async function runRedirectTrace() {
+    const inputElement = document.getElementById('redirect-input');
+    const resultsContainer = document.getElementById('redirect-results');
+    const loadingIndicator = document.getElementById('redirect-loading');
+    
+    const url = inputElement.value.trim();
+    if (!url) return;
+
+    // Reset UI
+    resultsContainer.style.display = 'none';
+    resultsContainer.innerHTML = '';
+    loadingIndicator.style.display = 'block';
+
+    // Fetch data from edge function
+    const chain = await fetchRedirectChain(url);
+    
+    loadingIndicator.style.display = 'none';
+
+    if (!chain || chain.length === 0) {
+        resultsContainer.innerHTML = `<div style="color: #ef4444;">Failed to trace URL. Please check the address and try again.</div>`;
+        resultsContainer.style.display = 'block';
+        return;
+    }
+
+    // Build HTML for the visual timeline
+    let htmlBuilder = `<div style="display: flex; flex-direction: column; gap: 12px; position: relative;">`;
+    
+    // Vertical line behind hops
+    htmlBuilder += `<div style="position: absolute; left: 15px; top: 20px; bottom: 20px; width: 2px; background: #334155; z-index: 0;"></div>`;
+
+    chain.forEach((hop, index) => {
+        const isLast = index === chain.length - 1;
+        
+        // Status code formatting
+        let statusColor = "#f59e0b"; // Yellow for 3xx
+        let bgColor = "rgba(245, 158, 11, 0.1)";
+        
+        if (hop.status >= 200 && hop.status < 300) {
+            statusColor = "#10b981"; // Green for 2xx
+            bgColor = "rgba(16, 185, 129, 0.1)";
+        } else if (hop.status >= 400) {
+            statusColor = "#ef4444"; // Red for 4xx/5xx errors
+            bgColor = "rgba(239, 68, 68, 0.1)";
+        }
+
+        htmlBuilder += `
+            <div style="display: flex; align-items: flex-start; gap: 16px; z-index: 1;">
+                <div style="min-width: 32px; height: 32px; border-radius: 50%; background: ${bgColor}; border: 2px solid ${statusColor}; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: ${statusColor};">
+                    ${index + 1}
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid #334155; padding: 12px; border-radius: 6px; flex: 1; word-break: break-all;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <strong style="color: #e2e8f0; font-size: 14px;">${hop.url}</strong>
+                        <span style="background: ${statusColor}; color: #000; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; height: fit-content;">
+                            ${hop.status} ${hop.statusText}
+                        </span>
+                    </div>
+                    ${!isLast ? '<div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">&rarr; Redirecting...</div>' : '<div style="font-size: 12px; color: #10b981; margin-top: 6px;">&check; Final Destination</div>'}
+                </div>
+            </div>
+        `;
+    });
+
+    htmlBuilder += `</div>`;
+    resultsContainer.innerHTML = htmlBuilder;
+    resultsContainer.style.display = 'block';
+}
+
+// Enter Key Event Listener
+document.getElementById('redirect-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        runRedirectTrace();
+    }
+});
