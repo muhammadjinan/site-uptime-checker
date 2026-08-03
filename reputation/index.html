@@ -57,6 +57,27 @@
     </main>
 </div>
 
+<!-- HTTP Redirect Tracker Card -->
+<div class="card" style="width: 100%; max-width: 800px; margin-top: 24px;">
+    <div class="card-header">
+        <span class="card-title">HTTP Redirect Chain Tracker</span>
+    </div>
+    <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+        <input type="text" id="redirect-input" placeholder="Enter URL (e.g., github.com)" style="flex: 1; padding: 10px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: white;">
+        <button class="inspect-btn" onclick="runRedirectTrace()">Trace Route</button>
+    </div>
+    
+    <!-- Loading State -->
+    <div id="redirect-loading" style="display: none; color: #94a3b8; font-size: 14px;">
+        Tracing network hops...
+    </div>
+
+    <!-- Chain Visualizer Container -->
+    <div id="redirect-results" style="display: none; margin-top: 16px;">
+        <!-- Rendered dynamically by JavaScript -->
+    </div>
+</div>
+    
 <!-- Technical Details Modal Pop-up -->
 <div id="detail-modal" class="modal-backdrop" onclick="closeModalOnBackdrop(event)" style="display: none;">
     <div class="modal-card">
